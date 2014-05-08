@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ 'Chat_CustomerHelp'|translate }}</title>
+<link href="/plugins/Chat/stylesheets/client/popout.css" rel="stylesheet">
+<link href="/plugins/Chat/stylesheets/client/perfect-scrollbar.min.css" rel="stylesheet">
+<link href="/plugins/Chat/stylesheets/client/font-awesome.min.css" rel="stylesheet">
+</head>
+
+<body>
+<input type="hidden" id="idvisitor" value="{{ idvisitor }}" />
+<div class="chat-container chat-state-1" {% if state == 1 %}style="display:block;"{% endif %}>
+	<div class="chat-wrapper">
+		<div class="chat-header">
+            <span class="circle green" style="{% if isStaffOnline == 0 %}display:none{% endif %}"></span> {{ 'Chat_CustomerHelp'|translate }}
+			<span class="action-logo">+</span>
+		</div>
+	</div>
+</div>
+
+<div class="chat-container chat-state-2" {% if state == 2 %}style="display:block;"{% endif %}>
+    <div class="is-staff-online">{% if isStaffOnline == 1 %}<div class="yes"><span class="circle"></span> {{ 'Chat_StaffOnline'|translate }}</div>{% endif %}</div>
+    <div class="chat-state-2-content">
+		<div class="chat-state-2-col-1">
+			<i class="fa fa-comments"></i>
+		</div>
+		<div class="chat-state-2-col-2">
+			<span>{{ 'Chat_AQuestion?'|translate }}<br />{{ 'Chat_AnIssue?'|translate }}<br /><strong>{{ 'Chat_ChatWithUs'|translate }}</strong></span>
+		</div>
+		<div class="clearfix"></div>
+	</div>
+	<div class="chat-state-2-input-container">
+		<form action="" id="form-chat-state-2">
+			<input type="text" class="chat-state-2-input" placeholder="{{ 'Chat_YourMessageHere'|translate }}" />
+			<input type="submit" class="chat-state-2-submit" />
+		</form>
+	</div>
+</div>
+
+<div class="chat-container chat-state-3" {% if state == 3 %}style="display:block;"{% endif %}>
+	<form id="form-chat-state-3">
+		<div class="chat-wrapper">
+			<div class="chat-header">
+                <span class="circle green" style="{% if isStaffOnline == 0 %}display:none{% endif %}"></span> {{ 'Chat_CustomerHelp'|translate }}
+			</div>
+			<div class="chat-content-block">
+				<p class="notice" style="{% if isStaffOnline == 0 %}display:none{% endif %}">{{ 'Chat_NotAvailable'|translate }}</p>
+				<div class="input-container">
+					<label>{{ 'Chat_PresentYourself'|translate }}</label>
+					<input class="name" type="text" placeholder="{{ 'Chat_Name'|translate }}" />
+					<input class="email" type="text" placeholder="{{ 'Chat_EmailAddress'|translate }}" />
+					
+					<label>{{ 'Chat_Message'|translate }}</label>
+					<textarea class="chat-input" placeholder="{{ 'Chat_WriteYourMessageHere'|translate }}"></textarea>
+					<br />
+				</div>
+			</div>
+			<div class="chat-push"></div>
+		</div>
+		<div class="chat-footer">
+			<div class="margin-container-15">
+				<input type="submit" class="submit-message" value="{{ 'Chat_SendMyMessage'|translate }}" />
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="chat-container chat-state-4" {% if state == 4 %}style="display:block;"{% endif %}>
+	<div class="chat-wrapper">
+		<div class="chat-header">
+            <span class="circle green" style="{% if isStaffOnline == 0 %}display:none{% endif %}"></span> {{ 'Chat_CustomerHelp'|translate }}
+			<span class="action-logo">-</span>
+		</div>
+		<div id="chat-conversation">
+			{% set lastAuthor = "null" %}
+			{% set hasQuit = true %}
+			{% set lastDate = "null" %}
+			{% set lastTime = "null" %}
+			{% set lastNameMsgStaff = "null" %}
+			{% set lastTimeMsgStaff = "null" %}
+			{% set firstMsgStaff = false %}
+			{% set i = 0 %}
+			{% set displayAuthor = false %}
+			{% set displayLoginStatus = false %}
+			
+			{% for message in messages %}
+				
+				{% if firstMsgStaff == true %}
+					{% if lastTimeMsgStaff < (message.microtime - (2 * 60 * 60)) %}
+						<p class="has-quit">{{ lastNameMsgStaff }} {{ 'Chat_HasQuit'|translate }}</p>
+						{% set hasQuit = true %}
+						{% set displayLoginStatus = true %}
+					{% endif %}
+				{% endif %}
+				
+				{% if message.answerfrom != "" %}
+					{% if hasQuit == true %}
+						<p class="has-quit">{{ message.answerfrom|raw }} {{ 'Chat_HasJoin'|translate }}</p>
+						{% set hasQuit = false %}
+						{% set displayLoginStatus = true %}
+					{% endif %}
+				{% endif %}
+			
+				{% if message.answerfrom != lastAuthor %}
+					{% set displayAuthor = true %}
+				{% endif %}
+				
+				{% if displayLoginStatus == true %}
+					{% set displayAuthor = true %}
+					{% set displayLoginStatus = false %}
+				{% endif %}
+				
+				{% if displayAuthor == true %}
+					<p class="author-container">
+						<span class="author">
+							{% if message.answerfrom == "" %}
+								{{ 'Chat_You'|translate }}
+							{% else %}
+								{{ message.answerfrom|raw }}
+								{% set firstMsgStaff = true %}
+							{% endif %}
+						</span>
+						<span class='microtime'>
+							<span class='date'{% if message.date == lastDate %} style="display:none"{% endif %}>{{ message.date|raw }}</span>
+							<span class='time'{% if message.time == lastTime %} style="display:none"{% endif %}>{{ message.time|raw }}</span>
+						</span>
+					</p>
+					{% set displayAuthor = false %}
+				{% endif %}
+				
+				<p class="chat-msg" data-microtime="{{ message.microtime|raw }}" data-date="{{ message.date|raw }}" data-time="{{ message.time|raw }}" title="{{ message.date|raw }} {{ message.time|raw }}">
+					{{ message.content|raw }}
+				</p>
+								
+				{% if message.answerfrom != '' %}
+					{% set lastNameMsgStaff = message.answerfrom %}
+					{% set lastTimeMsgStaff = message.microtime %}
+				{% endif %}
+				
+				{% set lastAuthor = message.answerfrom %}
+				{% set lastDate = message.date %}
+				{% set lastTime = message.time %}
+			{% endfor %}
+		</div>
+		<div class="chat-push"></div>
+	</div>
+	<div class="chat-footer">
+		<div class="chat-input-container">
+			<textarea class="chat-input" placeholder="{{ 'Chat_WriteYourMessageHere'|translate }}"></textarea>
+		</div>
+	</div>
+</div>
+<script src="/plugins/Chat/javascripts/client/jquery.min.js"></script>
+<script src="/plugins/Chat/javascripts/client/perfect-scrollbar.min.js"></script>
+<script src="/plugins/Chat/javascripts/client/easyXDM.min.js"></script>
+<script>
+    siteMainUrl = "{{ siteUrl }}";
+</script>
+<script src="/plugins/Chat/javascripts/client/popout.js"></script>
+<script>
+$(document).ready(function () {
+	Piwik_Chat_Popout.setTranslationTable({
+        'You': '{{ 'Chat_You'|translate }}',
+        'CustomerHelp': '{{ 'Chat_CustomerHelp'|translate }}',
+        'StaffOnline': '{{ 'Chat_StaffOnline'|translate }}',
+        'HasQuit': '{{ 'Chat_HasQuit'|translate }}',
+        'HasJoin': '{{ 'Chat_HasJoin'|translate }}'
+	});
+
+	Piwik_Chat_Popout.initialize({{ state }});
+});
+</script>
+</body>
+</html>
