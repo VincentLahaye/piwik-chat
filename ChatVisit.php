@@ -24,12 +24,12 @@ class ChatVisit extends Visit
         if ($excluded->isExcluded()) {
             return;
         }
-		
+
         $this->recognizeTheVisitor();
     }
-	
-	public function getVisitorInfo()
-	{
-		return $this->visitorInfo;
-	}
+
+    public function getVisitorInfo()
+    {
+        return $this->visitorInfo;
+    }
 }

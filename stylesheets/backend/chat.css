@@ -1,80 +1,81 @@
 .visitor-profile-pages-visited {
-	overflow-y: hidden;
+    overflow-y: hidden;
 }
-.visitor-profile-pages-visited ul li{
-	float:left;
-	line-height: 45px;
+
+.visitor-profile-pages-visited ul li {
+    float: left;
+    line-height: 45px;
     padding: 0 10px;
-	cursor:pointer;
-	color:#999;
+    cursor: pointer;
+    color: #999;
 }
 
-.visitor-profile-pages-visited ul li.active{
-	color:#222;
+.visitor-profile-pages-visited ul li.active {
+    color: #222;
 }
 
-.show{
-	display:block;
+.show {
+    display: block;
 }
 
-.hide{
-	display:none;
+.hide {
+    display: none;
 }
 
 .visitor-profile-chat-global-container {
-	border-top:1px solid #D1CEC8;
-	padding:10px;
-	background:#eee;
+    border-top: 1px solid #D1CEC8;
+    padding: 10px;
+    background: #eee;
 }
 
-.visitor-profile-chat-conversation-container{
-	padding:10px;
-	height:350px;
-	overflow-y:auto;
-	margin-bottom:10px;
-	background:white;
-	font-size:12px;
-	border:1px solid #D1CEC8;
+.visitor-profile-chat-conversation-container {
+    padding: 10px;
+    height: 350px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    background: white;
+    font-size: 12px;
+    border: 1px solid #D1CEC8;
 }
 
-.visitor-profile-chat-conversation-container p{
-	color:#333 !important;
-	padding-right: 150px;
+.visitor-profile-chat-conversation-container p {
+    color: #333 !important;
+    padding-right: 150px;
     position: relative;
 }
 
-.visitor-profile-chat-conversation-container p > .microtime{
+.visitor-profile-chat-conversation-container p > .microtime {
     position: absolute;
-	right: 10px;
+    right: 10px;
 }
 
-.visitor-profile-chat-conversation-container p.author{
-	border-top: 1px dashed #D1CEC8;
+.visitor-profile-chat-conversation-container p.author {
+    border-top: 1px dashed #D1CEC8;
     font-weight: bold;
     line-height: 25px;
     margin-top: 10px;
 }
 
-.visitor-profile-chat-conversation-container p.author:first-child{
-	border-top: 0;
+.visitor-profile-chat-conversation-container p.author:first-child {
+    border-top: 0;
     margin-top: 0;
 }
 
-.visitor-profile-chat-conversation-textarea{
-	height:100px;
-	width:100%;
-	background:white;
-	font-size:12px;
-	border:1px solid #D1CEC8;
-	color:#333;
+.visitor-profile-chat-conversation-textarea {
+    height: 100px;
+    width: 100%;
+    background: white;
+    font-size: 12px;
+    border: 1px solid #D1CEC8;
+    color: #333;
 }
 
-.list-conversations tr.unread td.content{
-	font-weight:bold;
+.list-conversations tr.unread td.content {
+    font-weight: bold;
 }
 
-.new-messages:before{
-	background: none repeat scroll 0 0 #D4291F;
+.new-messages:before {
+    background: none repeat scroll 0 0 #D4291F;
     border: 1px solid #D4291F;
     color: #FFFFFF;
     content: " ";
@@ -89,46 +90,46 @@
 }
 
 .Menu-tabList > li > a, .Menu-tabList > li > ul > li > a {
-	position:relative;
+    position: relative;
 }
 
 .Menu-tabList > li > ul > li > a.new-messages:before {
-	border-radius: 5px;
+    border-radius: 5px;
     height: 5px;
     right: 10px;
     top: 10px;
     width: 5px;
 }
 
-.visitor-personnal-informations{
-	border-bottom: 1px solid #D1CEC8;
+.visitor-personnal-informations {
+    border-bottom: 1px solid #D1CEC8;
     padding: 0 10px 15px 25px;
 }
 
-.visitor-personnal-informations h1{
-	margin-bottom: 10px;
+.visitor-personnal-informations h1 {
+    margin-bottom: 10px;
 }
 
-#form-visitor-personnal-informations .col1, #form-visitor-personnal-informations .col2{
-	width:50%;
-	float:left;
+#form-visitor-personnal-informations .col1, #form-visitor-personnal-informations .col2 {
+    width: 50%;
+    float: left;
 }
 
-#form-visitor-personnal-informations .input-text{
-	font-size: 13px;
-	height: 25px;
-	line-height: 17px;
-	width: 96%;
-	margin-bottom: 10px;
+#form-visitor-personnal-informations .input-text {
+    font-size: 13px;
+    height: 25px;
+    line-height: 17px;
+    width: 96%;
+    margin-bottom: 10px;
 }
 
-#form-visitor-personnal-informations textarea{
-	font-size: 13px;
-	height: 70px;
-	width: 96%;
-	margin-bottom: 3px;
+#form-visitor-personnal-informations textarea {
+    font-size: 13px;
+    height: 70px;
+    width: 96%;
+    margin-bottom: 3px;
 }
 
-.clearfix{
-	clear:both;
+.clearfix {
+    clear: both;
 }

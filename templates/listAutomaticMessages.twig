@@ -1,38 +1,38 @@
 <div class="dataTableWrapper">
-<table width="100%" cellspacing="0" style="width:100%;table-layout:fixed;" class="dataTable list-conversations">
-<thead>
-<tr>
-    <th style="width:100px" class="sortable label" id="label">
-        <div id="thDIV">ID</div>
-    </th>
-    <th class="sortable label" id="label">
-		<div id="thDIV">Name</div>
-	</th>
-    <th class="sortable label" id="label">
-		<div id="thDIV">Segment</div>
-	</th>
-    <th class="sortable label" id="label">
-        <div id="thDIV">Message</div>
-    </th>
-    <th style="width:100px" class="sortable label" id="label">
-        <div id="thDIV">Action</div>
-    </th>
-</tr>
-</thead>
-<tbody>
-{% for message in messages %}
+    <table width="100%" cellspacing="0" style="width:100%;table-layout:fixed;" class="dataTable list-conversations">
+        <thead>
+        <tr>
+            <th style="width:100px" class="sortable label" id="label">
+                <div id="thDIV">ID</div>
+            </th>
+            <th class="sortable label" id="label">
+                <div id="thDIV">Name</div>
+            </th>
+            <th class="sortable label" id="label">
+                <div id="thDIV">Segment</div>
+            </th>
+            <th class="sortable label" id="label">
+                <div id="thDIV">Message</div>
+            </th>
+            <th style="width:100px" class="sortable label" id="label">
+                <div id="thDIV">Action</div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for message in messages %}
 
-	<tr data-message-id="{{ message.id }}">
-		<td class="label column id">{{ message.id|raw }}</td>
-		<td class="label column name">{{ message.name|raw }}</td>
-		<td class="label column segment">{{ message.segment|raw }}</td>
-		<td class="label column content">{{ message.message|raw }}</td>
-		<td class="label column content"></td>
-	</tr>
-	
-{% endfor %}
+            <tr data-message-id="{{ message.id }}">
+                <td class="label column id">{{ message.id|raw }}</td>
+                <td class="label column name">{{ message.name|raw }}</td>
+                <td class="label column segment">{{ message.segment|raw }}</td>
+                <td class="label column content">{{ message.message|raw }}</td>
+                <td class="label column content"></td>
+            </tr>
+
+        {% endfor %}
 
 
-</tbody>
-</table>
+        </tbody>
+    </table>
 </div>

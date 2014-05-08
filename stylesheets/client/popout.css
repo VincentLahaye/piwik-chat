@@ -1,45 +1,50 @@
 html, body {
-	height: 100%;
-	width:100%;
-	font-family: sans-serif;
+    height: 100%;
+    width: 100%;
+    font-family: sans-serif;
 }
-body{
-	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 13px;
-	color:#333;
-	margin:0;
-	overflow: hidden;
+    color: #333;
+    margin: 0;
+    overflow: hidden;
 }
-.chat-container{
-	width:100%;
-	height:100%;
-	max-width:400px;
-	display:none;
-	margin:auto;
-	position:relative;
-	background: white;
-	/*border-left: 1px solid #CCC;
-	border-right: 1px solid #CCC;
-	box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
-	border-radius: 5px 5px 0 0;*/
+
+.chat-container {
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    display: none;
+    margin: auto;
+    position: relative;
+    background: white;
+    /*border-left: 1px solid #CCC;
+    border-right: 1px solid #CCC;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+    border-radius: 5px 5px 0 0;*/
 }
-form{
-	width:100%;
-	height:100%;
+
+form {
+    width: 100%;
+    height: 100%;
 }
-.chat-header{
-	width:100%;
-	height:30px;
-	line-height:30px;
-	background:#666;
-	color:white;
-	font-weight:bold;
-	text-align:center;
-	position:relative;
-	/*border-radius: 5px 5px 0 0;*/
+
+.chat-header {
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    background: #666;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    position: relative;
+    /*border-radius: 5px 5px 0 0;*/
 }
-.chat-header .action-logo{
-	color: #FFFFFF;
+
+.chat-header .action-logo {
+    color: #FFFFFF;
     cursor: pointer;
     display: block;
     font-size: 21px;
@@ -51,31 +56,36 @@ form{
     top: 0;
     width: 30px;
 }
+
 .chat-wrapper {
-	min-height: 100%;
-	height: auto !important;
-	height: 100%;
-	margin: 0 auto -60px; 
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -60px;
     position: relative;
 }
+
 .chat-footer, .chat-push {
-	height: 80px;
+    height: 80px;
 }
-.chat-footer{
-	position: absolute;
-	z-index: 3;
-	width: 100%;
-	border-top: 1px solid #eee;
-	bottom:0;
+
+.chat-footer {
+    position: absolute;
+    z-index: 3;
+    width: 100%;
+    border-top: 1px solid #eee;
+    bottom: 0;
 }
-.chat-input-container{
-	position: relative;
-	padding:10px 24px 0 10px;
+
+.chat-input-container {
+    position: relative;
+    padding: 10px 24px 0 10px;
 }
-.chat-input{
-	width:100%;
-	height:48px;	
-	background-color: #FFFFFF;
+
+.chat-input {
+    width: 100%;
+    height: 48px;
+    background-color: #FFFFFF;
     background-image: none;
     border: 1px solid #CCCCCC;
     border-radius: 4px;
@@ -86,17 +96,19 @@ form{
     line-height: 1.42857;
     padding: 4px 6px;
     transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
-	font-family: inherit;
-	font-size: inherit;
+    font-family: inherit;
+    font-size: inherit;
 }
+
 .chat-input:focus, .chat-state-3 input[type="text"]:focus {
     border-color: #66AFE9;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 233, 0.6);
     outline: 0 none;
 }
-#chat-conversation, .chat-content-block{
-	margin-bottom:10px;
-	padding-top:10px;
+
+#chat-conversation, .chat-content-block {
+    margin-bottom: 10px;
+    padding-top: 10px;
     bottom: 71px;
     direction: ltr;
     overflow-y: auto;
@@ -105,109 +117,116 @@ form{
     top: 30px;
     width: 100%;
 }
-#chat-conversation .chat-msg{
-	line-height: 14px;
+
+#chat-conversation .chat-msg {
+    line-height: 14px;
     margin: 0;
     padding-left: 10px;
-	position: relative;
+    position: relative;
 }
+
 #chat-conversation .microtime {
     position: absolute;
     right: 10px;
 }
+
 #chat-conversation .author {
     font-weight: bold;
 }
-#chat-conversation .author-container{
+
+#chat-conversation .author-container {
     margin-bottom: 3px;
     margin-top: 10px;
     padding-left: 10px;
-	position: relative;
+    position: relative;
 }
+
 #chat-conversation .author:first-child {
     border-top: 0 none;
     margin-top: 0;
 }
-#chat-conversation p:last-child{
-	margin-bottom:10px !important;
-}
-.chat-state-2{
-	width:250px;
-	height:auto;
-	display:none;
-	margin:auto;
-	position:relative;
-	background:#eee;
-	/*box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
-	border-radius: 5px 5px 0 0;*/
+
+#chat-conversation p:last-child {
+    margin-bottom: 10px !important;
 }
 
-.chat-state-2 .chat-state-2-content{
-	padding: 30px 0;
-	color: #666666;
+.chat-state-2 {
+    width: 250px;
+    height: auto;
+    display: none;
+    margin: auto;
+    position: relative;
+    background: #eee;
+    /*box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+    border-radius: 5px 5px 0 0;*/
 }
 
-.chat-state-2 .chat-input{
-	margin: 0;
+.chat-state-2 .chat-state-2-content {
+    padding: 30px 0;
+    color: #666666;
 }
 
-.chat-state-2-input-container{
-	background:white;
-	padding: 5px;
-	border-top: 1px solid #DDDDDD;
+.chat-state-2 .chat-input {
+    margin: 0;
 }
 
-.chat-state-2-input{
-	border:0; 
-	padding:4px;
-	width: 148px;
+.chat-state-2-input-container {
+    background: white;
+    padding: 5px;
+    border-top: 1px solid #DDDDDD;
 }
 
-.chat-state-2-submit{
-	border:1px solid #CCC;
-	border-radius: 4px;
+.chat-state-2-input {
+    border: 0;
+    padding: 4px;
+    width: 148px;
+}
+
+.chat-state-2-submit {
+    border: 1px solid #CCC;
+    border-radius: 4px;
     height: 30px;
     width: 80px;
-	cursor:pointer;
+    cursor: pointer;
 }
 
-.chat-state-2-col-1{
-	width:40%;
-	float:left;
-	text-align:center;
-	font-size: 60px;
+.chat-state-2-col-1 {
+    width: 40%;
+    float: left;
+    text-align: center;
+    font-size: 60px;
 }
 
-.chat-state-2-col-2{
-	width:60%;
-	float:left;
-	text-align:center;
-	margin-top:11px;
+.chat-state-2-col-2 {
+    width: 60%;
+    float: left;
+    text-align: center;
+    margin-top: 11px;
 }
 
-.clearfix{
-	clear:both;
+.clearfix {
+    clear: both;
 }
 
-.submit-message{
-	display:block;
-	border:0;
-	border-radius: 4px;
-	height: 35px;
+.submit-message {
+    display: block;
+    border: 0;
+    border-radius: 4px;
+    height: 35px;
     width: 100%;
-	font-weight:bold;
-	color:white;
-	background:#666;
-	cursor:pointer;
+    font-weight: bold;
+    color: white;
+    background: #666;
+    cursor: pointer;
 }
 
-.margin-container-15{
-	margin:15px;
+.margin-container-15 {
+    margin: 15px;
 }
 
-.chat-state-3 input[type="text"]{
-	width:100%;
-	background-color: #FFFFFF;
+.chat-state-3 input[type="text"] {
+    width: 100%;
+    background-color: #FFFFFF;
     background-image: none;
     border: 1px solid #CCCCCC;
     border-radius: 4px;
@@ -218,31 +237,31 @@ form{
     line-height: 1.42857;
     padding: 4px 6px;
     transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
-	font-family: inherit;
-	font-size: inherit;
+    font-family: inherit;
+    font-size: inherit;
 }
 
-.input-container{
-	margin-right:30px;
-	margin-left:15px;
+.input-container {
+    margin-right: 30px;
+    margin-left: 15px;
 }
 
-.input-container label{
-	display: block;
+.input-container label {
+    display: block;
     font-weight: bold;
     margin-bottom: 10px;
 }
 
-.input-container .name{
-	margin-bottom:10px;
+.input-container .name {
+    margin-bottom: 10px;
 }
 
-.input-container .email{
-	margin-bottom:10px;
+.input-container .email {
+    margin-bottom: 10px;
 }
 
-.chat-content-block .notice{
-	margin: 0 15px 5px;
+.chat-content-block .notice {
+    margin: 0 15px 5px;
 }
 
 .chat-state-3 .chat-footer, .chat-state-3 .chat-push {
@@ -254,7 +273,7 @@ form{
 }
 
 .has-quit {
-	border-bottom: 1px solid #EEEEEE;
+    border-bottom: 1px solid #EEEEEE;
     border-top: 1px solid #EEEEEE;
     font-style: italic;
     margin: 10px 0;
@@ -262,12 +281,12 @@ form{
     text-align: center;
 }
 
-.is-staff-online{
+.is-staff-online {
     margin: 8px 0 0 80px;
     position: absolute;
 }
 
-.chat-state-2 .circle{
+.chat-state-2 .circle {
     border-radius: 3px;
     display: block;
     float: left;
@@ -276,7 +295,7 @@ form{
     width: 6px;
 }
 
-.chat-header .circle{
+.chat-header .circle {
     border-radius: 4px;
     height: 8px;
     margin: 11px 7px 0 -15px;
@@ -284,14 +303,14 @@ form{
     width: 8px;
 }
 
-.circle.green{
+.circle.green {
     background: none repeat scroll 0 0 #0F9D28;
 }
 
-.is-staff-online .yes{
+.is-staff-online .yes {
     color: #0F9D28;
 }
 
-.is-staff-online .yes .circle{
+.is-staff-online .yes .circle {
     background: none repeat scroll 0 0 #0F9D28;
 }

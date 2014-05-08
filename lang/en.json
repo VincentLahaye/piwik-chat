@@ -1,23 +1,23 @@
 {
-	"Chat": {
-		"Chat": "Chat",
-		"You": "You",
-		"WriteYourMessageHere": "Write your message here and press enter.",
-		"YourMessageHere": "Your message here",
-		"CustomerHelp": "Customer Help",
-		"Visitor": "Visitor",
-		"Date": "Date",
-		"VisitorID": "Visitor ID",
-		"LastMessage": "Last Message",
-		"AQuestion?": "A question?",
-		"AnIssue?": "An issue?",
-		"ChatWithUs": "Chat with us!",
-		"NotAvailable": "Sorry, we're not online at the moment. Leave a message and we'll get back to you.",
-		"Name": "Name",
-		"EmailAddress": "Email Address",
-		"Message": "Message",
-		"PresentYourself": "Present yourself",
-		"SendMyMessage": "Send my message",
+    "Chat": {
+        "Chat": "Chat",
+        "You": "You",
+        "WriteYourMessageHere": "Write your message here and press enter.",
+        "YourMessageHere": "Your message here",
+        "CustomerHelp": "Customer Help",
+        "Visitor": "Visitor",
+        "Date": "Date",
+        "VisitorID": "Visitor ID",
+        "LastMessage": "Last Message",
+        "AQuestion?": "A question?",
+        "AnIssue?": "An issue?",
+        "ChatWithUs": "Chat with us!",
+        "NotAvailable": "Sorry, we're not online at the moment. Leave a message and we'll get back to you.",
+        "Name": "Name",
+        "EmailAddress": "Email Address",
+        "Message": "Message",
+        "PresentYourself": "Present yourself",
+        "SendMyMessage": "Send my message",
         "PersonalInformations": "Personal Informations",
         "Phone": "Phone",
         "Comments": "Comments",
@@ -25,7 +25,7 @@
         "StaffOnline": "Staff online",
         "HasQuit": "has quit this session.",
         "HasJoin": "has join this session.",
-		"": "",
-		"": ""
-	}
+        "": "",
+        "": ""
+    }
 }

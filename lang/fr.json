@@ -1,23 +1,23 @@
 {
-	"Chat": {
-		"Chat": "Chat",
-		"You": "Vous",
-		"WriteYourMessageHere": "Ecrivez votre message ici, et appuyez sur entrée.",
-		"YourMessageHere": "Votre message ici",
-		"CustomerHelp": "Aide à la clientèle",
-		"Visitor": "Visiteur",
-		"Date": "Date",
-		"VisitorID": "ID Visiteur",
-		"LastMessage": "Dernier Message",
-		"AQuestion?": "Une question ?",
-		"AnIssue?": "Un problème ?",
-		"ChatWithUs": "Chattez avec nous !",
-		"NotAvailable": "Nous ne sommes pas en ligne pour le moment. Laissez-nous un message et nous vous recontacterons.",
-		"Name": "Nom",
-		"EmailAddress": "Adresse Email",
-		"Message": "Message",
-		"PresentYourself": "Présentez-vous",
-		"SendMyMessage": "Envoyer mon message",
+    "Chat": {
+        "Chat": "Chat",
+        "You": "Vous",
+        "WriteYourMessageHere": "Ecrivez votre message ici, et appuyez sur entrée.",
+        "YourMessageHere": "Votre message ici",
+        "CustomerHelp": "Aide à la clientèle",
+        "Visitor": "Visiteur",
+        "Date": "Date",
+        "VisitorID": "ID Visiteur",
+        "LastMessage": "Dernier Message",
+        "AQuestion?": "Une question ?",
+        "AnIssue?": "Un problème ?",
+        "ChatWithUs": "Chattez avec nous !",
+        "NotAvailable": "Nous ne sommes pas en ligne pour le moment. Laissez-nous un message et nous vous recontacterons.",
+        "Name": "Nom",
+        "EmailAddress": "Adresse Email",
+        "Message": "Message",
+        "PresentYourself": "Présentez-vous",
+        "SendMyMessage": "Envoyer mon message",
         "PersonalInformations": "Informations Personnelles",
         "Phone": "Téléphone",
         "Comments": "Commentaires",
@@ -26,6 +26,6 @@
         "HasQuit": "a quitté cette session.",
         "HasJoin": "a rejoint cette session.",
         "": "",
-		"": ""
-	}
+        "": ""
+    }
 }

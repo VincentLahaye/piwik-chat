@@ -17,9 +17,14 @@ use Piwik\Tracker\Request;
 
 class ChatTracker extends Tracker
 {
-	private $visitorInfo;
+    private $visitorInfo;
 
-	/**
+    public function getVisitorInfo()
+    {
+        return $this->visitorInfo;
+    }
+
+    /**
      * Returns the Tracker_Visit object.
      * This method can be overwritten to use a different Tracker_Visit object
      *
@@ -34,7 +39,7 @@ class ChatTracker extends Tracker
          * Triggered before a new **visit tracking object** is created. Subscribers to this
          * event can force the use of a custom visit tracking object that extends from
          * {@link Piwik\Tracker\VisitInterface}.
-         * 
+         *
          * @param \Piwik\Tracker\VisitInterface &$visit Initialized to null, but can be set to
          *                                              a new visit object. If it isn't modified
          *                                              Piwik uses the default class.
@@ -48,8 +53,8 @@ class ChatTracker extends Tracker
         }
         return $visit;
     }
-	
-	/**
+
+    /**
      * @param $params
      * @param $tokenAuth
      * @return array
@@ -75,8 +80,8 @@ class ChatTracker extends Tracker
 
                 $visit->setRequest($request);
                 $visit->handle();
-				
-				$this->visitorInfo = $visit->getVisitorInfo();
+
+                $this->visitorInfo = $visit->getVisitorInfo();
             } else {
                 Common::printDebug("The request is invalid: empty request, or maybe tracking is disabled in the config.ini.php via record_statistics=0");
             }
@@ -93,8 +98,8 @@ class ChatTracker extends Tracker
         //++$this->countOfLoggedRequests;
         return $isAuthenticated;
     }
-	
-	/**
+
+    /**
      * Cleanup
      */
     protected function end()
@@ -128,9 +133,4 @@ class ChatTracker extends Tracker
 
         self::disconnectDatabase();
     }
-	
-	public function getVisitorInfo()
-	{
-		return $this->visitorInfo;
-	}
 }

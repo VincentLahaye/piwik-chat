@@ -1,34 +1,39 @@
 <div class="dataTableWrapper">
-<table width="100%" cellspacing="0" style="width:100%;table-layout:fixed;" class="dataTable list-conversations">
-<thead>
-<tr>
-    <th width="140px" style="cursor: auto;width:140px;" class="sortable label" id="label">
-        <div id="thDIV">{{ 'Chat_Date'|translate }}</div>
-    </th>
-    <th width="150px" style="cursor: auto;width:150px;" class="sortable label" id="label">
-		<div id="thDIV">{{ 'Chat_VisitorID'|translate }}</div>
-	</th>
-    <th width="200px" style="cursor: auto;width:200px;" class="sortable label" id="label">
-		<div id="thDIV">{{ 'Chat_Name'|translate }}</div>
-	</th>
-    <th style="cursor: auto;" class="sortable label" id="label">
-        <div id="thDIV">{{ 'Chat_LastMessage'|translate }}</div>
-    </th>
-</tr>
-</thead>
-<tbody>
-{% for message in messages %}
+    <table width="100%" cellspacing="0" style="width:100%;table-layout:fixed;" class="dataTable list-conversations">
+        <thead>
+        <tr>
+            <th width="140px" style="cursor: auto;width:140px;" class="sortable label" id="label">
+                <div id="thDIV">{{ 'Chat_Date'|translate }}</div>
+            </th>
+            <th width="150px" style="cursor: auto;width:150px;" class="sortable label" id="label">
+                <div id="thDIV">{{ 'Chat_VisitorID'|translate }}</div>
+            </th>
+            <th width="200px" style="cursor: auto;width:200px;" class="sortable label" id="label">
+                <div id="thDIV">{{ 'Chat_Name'|translate }}</div>
+            </th>
+            <th style="cursor: auto;" class="sortable label" id="label">
+                <div id="thDIV">{{ 'Chat_LastMessage'|translate }}</div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for message in messages %}
 
-	<tr class="{% if (unread[message.idvisitor] is defined) %}unread{% endif %}" data-visitor-id="{{ message.idvisitor }}">
-		<td class="label column date">{{ message.date|raw }} {{ message.time|raw }}</td>
-		<td class="label column idvisitor">{{ message.idvisitor|raw }}</td>
-		<td class="label column name">{{ message.name|raw }}</td>
-		<td class="label column content"><a class="visitor-chat-profile-link" title="{{ 'Live_ViewVisitorProfile'|translate }}" data-visitor-id="{{ message.idvisitor }}" data-goto-chat="1" onclick="Piwik_Chat_Admin.clickOnProfileLink($(this));">{{ message.content|raw }}</a></td>
-	</tr>
-	
-{% endfor %}
+            <tr class="{% if (unread[message.idvisitor] is defined) %}unread{% endif %}"
+                data-visitor-id="{{ message.idvisitor }}">
+                <td class="label column date">{{ message.date|raw }} {{ message.time|raw }}</td>
+                <td class="label column idvisitor">{{ message.idvisitor|raw }}</td>
+                <td class="label column name">{{ message.name|raw }}</td>
+                <td class="label column content"><a class="visitor-chat-profile-link"
+                                                    title="{{ 'Live_ViewVisitorProfile'|translate }}"
+                                                    data-visitor-id="{{ message.idvisitor }}" data-goto-chat="1"
+                                                    onclick="Piwik_Chat_Admin.clickOnProfileLink($(this));">{{ message.content|raw }}</a>
+                </td>
+            </tr>
+
+        {% endfor %}
 
 
-</tbody>
-</table>
+        </tbody>
+    </table>
 </div>
