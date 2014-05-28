@@ -27,7 +27,7 @@ class Chat extends \Piwik\Plugin
         return array(
             'AssetManager.getJavaScriptFiles' => 'getJsFiles',
             'AssetManager.getStylesheetFiles' => 'getCssFiles',
-            'Menu.Reporting.addItems' => 'getReportingMenuItems'
+            'Menu.Reporting.addItems' => 'getReportingMenuItems',
         );
     }
 
@@ -74,7 +74,6 @@ class Chat extends \Piwik\Plugin
             $showOnlyIf = Piwik::hasUserSuperUserAccess(),
             $order = 14
         );*/
-
     }
 
     public function install()

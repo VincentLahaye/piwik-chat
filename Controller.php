@@ -17,7 +17,10 @@ use Piwik\Piwik;
 use Piwik\Plugins\Goals\API as APIGoals;
 use Piwik\Segment;
 use Piwik\Tracker;
+use Piwik\Tracker\Settings;
+use Piwik\Tracker\Visitor;
 use Piwik\Url;
+use Piwik\UrlHelper;
 use Piwik\View;
 use UserAgentParser;
 
@@ -106,31 +109,33 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
 
     public function popout()
     {
-        header("Access-Control-Allow-Origin: pm.fr");
+        header("Access-Control-Allow-Origin: *");
 
-        $process = new ChatTracker();
+        $params = UrlHelper::getArrayFromQueryString ($_SERVER['QUERY_STRING']);
+        $request = new Tracker\Request($params);
 
-        try {
-            $process->main();
-            $visitorInfo = $process->getVisitorInfo();
-        } catch (Exception $e) {
-            echo "Error:" . $e->getMessage();
-        }
+        /***
+         * Visitor recognition
+         */
+        $visitor = new Visitor($request);
+        $visitor->recognize();
 
-        if (!isset($visitorInfo['idvisitor']))
-            return;
+        $info = $visitor->getVisitorInfo();
 
+        /***
+         * Segment recognition
+         */
+        /*$segment = new Segment("visitorConfigId==" . bin2hex($config['config_id']), 1);
+        $query = $segment->getSelectQuery("idvisitor", "log_visit");
 
-        //$segment = new Segment("browserCode==FF;visitorId==498e0cdb23c8b0f7", 1);
-        //$query = $segment->getSelectQuery("idvisitor", "log_visit");
+        $rows = Db::fetchAll($query['sql'], $query['bind']);
 
-        //$rows = Db::fetchAll($query['sql'], $query['bind']);
-
-        //print_r($rows);
+        print_r($query);
+        print_r($rows);*/
 
         $idSite = Common::getRequestVar('idsite', null, 'int');
 
-        $conversation = new Conversation($idSite, bin2hex($visitorInfo['idvisitor']));
+        $conversation = new Conversation($idSite, bin2hex($info['idvisitor']));
         $messages = $conversation->getAllMessages();
 
         if (count($messages) == 0) {
@@ -142,7 +147,7 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         $view = new View('@Chat/popout.twig');
         $view->messages = $messages;
         $view->state = $_SESSION['popoutState'];
-        $view->idvisitor = bin2hex($visitorInfo['idvisitor']);
+        $view->idvisitor = bin2hex($info['idvisitor']);
         $view->timeLimit = time() - (2 * 60 * 60);
         $view->isStaffOnline = $conversation->isStaffOnline();
         $view->siteUrl = $conversation->getSiteMainUrl();

@@ -5,6 +5,9 @@
     "keywords": ["chat"],
     "license": "GPL v3+",
     "homepage": "https://github.com/VincentLahaye/piwik-chat",
+    "require": {
+        "piwik": "2.2.3"
+    },
     "authors": [
         {
             "name": "Vincent Lahaye",

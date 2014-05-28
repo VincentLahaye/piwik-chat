@@ -57,7 +57,7 @@ class Conversation
 
     public function getNewMessages($microtime, $fromAdmin = false)
     {
-        $answerfrom = $idvisitor = $getidvisitor = "";
+        $idvisitor = $getidvisitor = "";
         $arguments = array();
 
         if ($fromAdmin) {
@@ -166,7 +166,6 @@ class Conversation
         return false;
     }
 
-
     /**************************************************************************
      * History Admin
      **************************************************************************/
@@ -218,7 +217,6 @@ class Conversation
 
         return $conversations;
     }
-
 
     /**************************************************************************
      * Personnal Informations
@@ -311,10 +309,8 @@ class Conversation
 
     public function getLastPoll($login = false)
     {
-        if ($login)
-            return Db::fetchOne("SELECT last_poll FROM " . Common::prefixTable('user') . " WHERE login = ?", array($login));
-        else
-            return Db::fetchOne("SELECT last_poll FROM " . Common::prefixTable('user') . " ORDER BY last_poll DESC LIMIT 1", array($login));
+        $query = ($login) ? "WHERE login = ?" : "ORDER BY last_poll DESC LIMIT 1";
+        return Db::fetchOne("SELECT last_poll FROM " . Common::prefixTable('user') . " " . $query, array($login));
     }
 
     public function isStaffOnline()
@@ -322,10 +318,7 @@ class Conversation
         $timeout = 2; // in minutes
         $lastPoll = $this->getLastPoll();
 
-        if ($lastPoll < (microtime(true) - ($timeout * 60)))
-            return false;
-        else
-            return true;
+        return !($lastPoll < (microtime(true) - ($timeout * 60)));
     }
 
     /**************************************************************************
