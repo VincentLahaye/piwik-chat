@@ -60,12 +60,6 @@ var Piwik_Chat_Popout = (function ($) {
         isStaffAFK();
 
         poll();
-
-        /*$('#chat-conversation').perfectScrollbar({
-         minScrollbarLength: 20,
-         });
-
-         $('.chat-content-block').perfectScrollbar();*/
     }
 
     function getQueryParams(qs) {
