@@ -17,7 +17,7 @@ use Piwik\Piwik;
 use Piwik\Plugins\Goals\API as APIGoals;
 use Piwik\Segment;
 use Piwik\Tracker;
-use Piwik\Tracker\Settings;
+use Piwik\Tracker\VisitExcluded;
 use Piwik\Tracker\Visitor;
 use Piwik\Url;
 use Piwik\UrlHelper;
@@ -37,7 +37,6 @@ $GLOBALS['PIWIK_TRACKER_DEBUG_FORCE_SCHEDULED_TASKS'] = false;
  */
 class Controller extends \Piwik\Plugin\ControllerAdmin
 {
-
     public function index()
     {
         Piwik::checkUserHasSomeAdminAccess();
@@ -114,13 +113,27 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         $params = UrlHelper::getArrayFromQueryString ($_SERVER['QUERY_STRING']);
         $request = new Tracker\Request($params);
 
+        // the IP is needed by isExcluded() and GoalManager->recordGoals()
+        $ip = $request->getIp();
+        $visitorInfo['location_ip'] = $ip;
+
+        /**
+         * Triggered after visits are tested for exclusion so plugins can modify the IP address
+         * persisted with a visit.
+         *
+         * This event is primarily used by the **PrivacyManager** plugin to anonymize IP addresses.
+         *
+         * @param string &$ip The visitor's IP address.
+         */
+        Piwik::postEvent('Tracker.setVisitorIp', array(&$visitorInfo['location_ip']));
+
         /***
          * Visitor recognition
          */
-        $visitor = new Visitor($request);
+        $visitor = new Visitor($request, $visitorInfo);
         $visitor->recognize();
 
-        $info = $visitor->getVisitorInfo();
+        $visitorInfo = $visitor->getVisitorInfo();
 
         /***
          * Segment recognition
@@ -135,7 +148,7 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
 
         $idSite = Common::getRequestVar('idsite', null, 'int');
 
-        $conversation = new Conversation($idSite, bin2hex($info['idvisitor']));
+        $conversation = new Conversation($idSite, bin2hex($visitorInfo['idvisitor']));
         $messages = $conversation->getAllMessages();
 
         if (count($messages) == 0) {
@@ -147,7 +160,7 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         $view = new View('@Chat/popout.twig');
         $view->messages = $messages;
         $view->state = $_SESSION['popoutState'];
-        $view->idvisitor = bin2hex($info['idvisitor']);
+        $view->idvisitor = bin2hex($visitorInfo['idvisitor']);
         $view->timeLimit = time() - (2 * 60 * 60);
         $view->isStaffOnline = $conversation->isStaffOnline();
         $view->siteUrl = $conversation->getSiteMainUrl();
