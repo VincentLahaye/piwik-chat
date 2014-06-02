@@ -17,8 +17,8 @@ var Piwik_Chat_Popout = (function ($) {
         if (state == 4) {
             var lastTimeMsgStaff = parseInt($(".author:not(:contains('" + __tr['You'] + "'))").last().parent().next().attr('data-microtime'));
 
-            if (lastTimeMsgStaff < parseInt((Date.now() / 1000) - (2 * 60 * 60)) && !$("#chat-conversation p").last().hasClass('has-quit')) {
-                $('#chat-conversation').append('<p class="has-quit">' + $(".author:not(:contains('" + __tr['You'] + "'))").last().html() + ' has quit this session.</p>');
+            if (lastTimeMsgStaff < parseInt((Date.now() / 1000) - (2 * 60 * 60)) && !$("#chat-conversation p.has-quit").last().hasClass('offline')) {
+                $('#chat-conversation').append('<p class="has-quit offline">' + $(".author:not(:contains('" + __tr['You'] + "'))").last().html() + ' has quit this session.</p>');
                 staffAlreadyAfk = true;
 
                 scrollDown();

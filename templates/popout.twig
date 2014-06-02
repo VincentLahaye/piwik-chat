@@ -93,9 +93,9 @@
 
             {% for message in messages %}
 
-                {% if firstMsgStaff == true %}
+                {% if hasQuit == false %}
                     {% if lastTimeMsgStaff < (message.microtime - (2 * 60 * 60)) %}
-                        <p class="has-quit">{{ lastNameMsgStaff }} {{ 'Chat_HasQuit'|translate }}</p>
+                        <p class="has-quit offline">{{ lastNameMsgStaff }} {{ 'Chat_HasQuit'|translate }}</p>
                         {% set hasQuit = true %}
                         {% set displayLoginStatus = true %}
                     {% endif %}
