@@ -1,6 +1,7 @@
 # Chat Plugin for Piwik
 Engage people you don't know at all, with this targeted and efficient chat system, directly integrated into Piwik.
 The client has these three states, plus a minimized state :
+
 ![Chat Client](/screenshots/ClientState2.png?raw=true "Chat Client State 2")
 ![Chat Client](/screenshots/ClientState3.png?raw=true "Chat Client State 3")
 ![Chat Client](/screenshots/ClientState4.png?raw=true "Chat Client State 4")
