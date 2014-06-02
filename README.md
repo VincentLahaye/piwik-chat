@@ -1,8 +1,12 @@
 # Chat Plugin for Piwik
 Engage people you don't know at all, with this targeted and efficient chat system, directly integrated into Piwik.
-![Chat Client](/screenshots/ClientState2.png?raw=true "Chat Client State 2" =240x)
-![Chat Client](/screenshots/ClientState3.png?raw=true "Chat Client State 3" =240x)
-![Chat Client](/screenshots/ClientState4.png?raw=true "Chat Client State 4" =240x)
+The client has these three states, plus a minimized state :
+![Chat Client](/screenshots/ClientState2.png?raw=true "Chat Client State 2")
+![Chat Client](/screenshots/ClientState3.png?raw=true "Chat Client State 3")
+![Chat Client](/screenshots/ClientState4.png?raw=true "Chat Client State 4")
+
+And here is the updated Visitor Profile :
+![Backend](/screenshots/BackendVisitorProfile.png?raw=true "Visitor Profile in Backend")
 
 ## How it works
 On the backend, this plugin modifies the visitorProfile popup, by adding to it a "Chat" tab next to "Visited pages". A new menu "Chat" is available, which allows to browse all conversations.
