@@ -9,28 +9,17 @@ Soon, a reporting system will be integrated, which will show figures like conver
 After installing the plugin, you have to modify your tracking code. It includes the file "javascripts/client/client.js", which waits for the Tracker() to initialize, then appends an iframe to the page. This iframe requests the "popout" action of the controller, where the plugin tries to identify the visitor based on his visitorID or configID.
 
 ## Installation
-Update your piwik tracking code :
+Add this code, after Piwik's tracking code :
 
-    <!-- Piwik -->
+    <!-- Piwik Chat -->
     <script type="text/javascript">
-      var _paq = _paq || [];
-      _paq.push(['trackPageView']);
-      _paq.push(['enableLinkTracking']);
-      var siteId = 2, piwikDName = "YOUR PIWIK DOMAIN";
-      (function() {
-        var u=(("https:" == document.location.protocol) ? "https" : "http") + "://"+ piwikDName  +"/";
-        _paq.push(['setTrackerUrl', u+'piwik.php']);
-        _paq.push(['setSiteId', siteId]);
-        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
-        g.defer=false; g.async=true; g.src=u+'js/piwik.js'; s.parentNode.insertBefore(g,s);
-
-        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
-        g.defer=false; g.async=true; g.src=u+'plugins/Chat/javascripts/client/client.js'; s.parentNode.insertBefore(g,s);
-      })();
-
+        (function() {
+            var u=(("https:" == document.location.protocol) ? "https://{$PIWIK_URL}/" : "http://{$PIWIK_URL}/");
+            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+            g.defer=true; g.async=true; g.src=u+'plugins/Chat/javascripts/client/client.js'; s.parentNode.insertBefore(g,s);
+        })();
     </script>
-    <noscript><p><img src="http://analytics.puissance-moteur.fr/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
-    <!-- End Piwik Code -->
+    <!-- End Piwik Chat Code -->
 
 ## Changelog
 v0.1 :
@@ -48,10 +37,6 @@ v0.2 :
 v0.3 :
 
 *   Add support for automatic messages by segment recognition
-
-## To DO
-*   Add getRequest() public access (piwik.js)
-*   Simplify the updated tracking code
 
 ## Academical study
 As an MSc student in eBusiness, this project is part of my final dissertation : "How to engage people you don't know at all ?".
