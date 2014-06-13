@@ -9,13 +9,6 @@ The client has these three states, plus a minimized state :
 And here is the updated Visitor Profile :
 ![Backend](/screenshots/BackendVisitorProfile.png?raw=true "Visitor Profile in Backend")
 
-## How it works
-On the backend, this plugin modifies the visitorProfile popup, by adding to it a "Chat" tab next to "Visited pages". A new menu "Chat" is available, which allows to browse all conversations.
-
-Soon, a reporting system will be integrated, which will show figures like conversion rate or engagement, in function of the Chat's use.
-
-After installing the plugin, you have to modify your tracking code. It includes the file "javascripts/client/client.js", which waits for the Tracker() to initialize, then appends an iframe to the page. This iframe requests the "popout" action of the controller, where the plugin tries to identify the visitor based on his visitorID or configID.
-
 ## Installation
 Add this code, after Piwik's tracking code :
 
@@ -28,6 +21,13 @@ Add this code, after Piwik's tracking code :
         })();
     </script>
     <!-- End Piwik Chat Code -->
+
+## How it works
+On the backend, this plugin modifies the visitorProfile popup, by adding to it a "Chat" tab next to "Visited pages". A new menu "Chat" is available, which allows to browse all conversations.
+
+Soon, a reporting system will be integrated, which will show figures like conversion rate or engagement, in function of the Chat's use.
+
+After installing the plugin, you have to modify your tracking code. It includes the file "javascripts/client/client.js", which waits for the Tracker() to initialize, then appends an iframe to the page. This iframe requests the "popout" action of the controller, where the plugin tries to identify the visitor based on his visitorID or configID.
 
 ## Changelog
 v0.1 :
