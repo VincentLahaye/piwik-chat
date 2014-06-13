@@ -130,7 +130,9 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         /***
          * Visitor recognition
          */
-        $visitor = new Visitor($request, $visitorInfo);
+        $settings = new Tracker\Settings($request, $visitorInfo['location_ip']);
+
+        $visitor = new Visitor($request, $settings, $visitorInfo);
         $visitor->recognize();
 
         $visitorInfo = $visitor->getVisitorInfo();
