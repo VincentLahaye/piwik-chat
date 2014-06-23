@@ -1236,8 +1236,18 @@ var Piwik_Chat_Client = (function () {
             ctnifrm.style.height = 0 + "px";
             document.body.appendChild(ctnifrm);
 
+            var scripts = document.getElementsByTagName( 'script' );
+            var len = scripts.length;
+            var absoluteAddr;
+            for(var i =0; i < len; i++) {
+                if(scripts[i].src.search("plugins/Chat/javascripts/client/client.js") > 0 && scripts[i].src.lastIndexOf("/") >= 0) {
+                    absoluteAddr = scripts[i].src.replace("plugins/Chat/javascripts/client/client.js", "");
+                    break;
+                }
+            }
+
             var transport = new easyXDM.Socket({
-                remote: "http://devpiwik.puissance-moteur.fr/" + Piwik.getAsyncTracker().getRequest("index.php?module=Chat&action=popout"),
+                remote: absoluteAddr + Piwik.getAsyncTracker().getRequest("index.php?module=Chat&action=popout"),
                 //swf: REMOTE + "/../easyxdm.swf",
                 container: "piwik-chat-container",
                 onMessage: function (message, origin) {
