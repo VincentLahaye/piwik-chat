@@ -1,5 +1,6 @@
 # Chat Plugin for Piwik
 Engage people you don't know at all, with this targeted and efficient chat system, directly integrated into Piwik.
+
 The client has these three states, plus a minimized state :
 
 ![Chat Client](/screenshots/ClientState2.png?raw=true "Chat Client State 2")
@@ -35,6 +36,8 @@ v0.1 :
 +   Basic chat functions with client/server communication and Piwik integration
 +   Add additional inputs in the visitor profile in order to save personal informations about a visitor (name, email, phone and comments)
 +   The client shows if someone of the staff is online or not
++   Sound notifications on both sides
++   French translation
 
 ## Roadmap
 v0.2 :
