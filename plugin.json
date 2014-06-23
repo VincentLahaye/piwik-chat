@@ -1,12 +1,12 @@
 {
     "name": "Chat",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "description": "Engage people you don't know at all, with this targeted and efficient chat system, directly integrated into Piwik.",
     "keywords": ["chat"],
     "license": "GPL v3+",
     "homepage": "https://github.com/VincentLahaye/piwik-chat",
     "require": {
-        "piwik": "2.2.3"
+        "piwik": "2.4.0-b4"
     },
     "authors": [
         {
