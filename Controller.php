@@ -170,6 +170,12 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         return $view->render();
     }
 
+    public function help()
+    {
+        $view = new View('@Chat/help.twig');
+        return $view->render();
+    }
+
     /*public function automaticmessages()
     {
         $idsite = common::getrequestvar('idsite', null, 'int');

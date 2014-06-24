@@ -23,6 +23,11 @@ Piwik_Chat_Admin = (function ($, require) {
         poll();
     }
 
+    function displayHelp(){
+        console.log('Display help');
+        broadcast.propagateNewPopoverParameter('chatHelp', 1);
+    }
+
     function getQueryParams(qs) {
         qs = qs.split("+").join(" ");
 
@@ -247,6 +252,10 @@ Piwik_Chat_Admin = (function ($, require) {
 
         clickOnProfileLink: function (domElement) {
             return clickOnProfileLink(domElement);
+        },
+
+        displayHelp: function () {
+            return displayHelp();
         }
     }
 })(jQuery, require);
@@ -419,6 +428,11 @@ Piwik_Chat_Admin = (function ($, require) {
 
                 return false;
             });
+
+            $element.on('load', 'body', function (e) {
+                Piwik_Chat_Admin.displayHelp();
+                return false;
+            });
         }
     });
 
@@ -433,7 +447,7 @@ Piwik_Chat_Admin = (function ($, require) {
         if ($('.RealTimeMap').length > 0) {
             url += '&showMap=0';
         }
-        console.log(chat);
+
         if (chat) {
             url += '&chat=1';
         }
@@ -441,4 +455,10 @@ Piwik_Chat_Admin = (function ($, require) {
         Piwik_Popover.createPopupAndLoadUrl(url, _pk_translate('Live_VisitorProfile'), 'visitor-profile-popup');
     });
 
+    broadcast.addPopoverHandler('chatHelp', function (test) {
+        Piwik_Popover.createPopupAndLoadUrl('module=Chat&action=help', _pk_translate('Live_VisitorProfile'), 'visitor-profile-popup');
+    });
+
 })(jQuery, require);
+
+
