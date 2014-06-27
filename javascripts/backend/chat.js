@@ -95,101 +95,105 @@ Piwik_Chat_Admin = (function ($, require) {
     }
 
     function pollChat(visitorId, microtime) {
+        if(getQueryParams("module") == "coreHome"){
 
-        xhrRequests['pollChat'] = $.ajax({
-            type: "GET",
-            url: "/index.php",
-            dataType: "json",
-            cache: false,
-            data: {module: 'API', method: 'Chat.poll', visitorId: visitorId, idSite: piwik.idSite, format: 'json', microtime: microtime, fromAdmin: true},
-            success: function (data) {
-                console.log(data);
+            xhrRequests['pollChat'] = $.ajax({
+                type: "GET",
+                url: "/index.php",
+                dataType: "json",
+                cache: false,
+                data: {module: 'API', method: 'Chat.poll', visitorId: visitorId, idSite: piwik.idSite, format: 'json', microtime: microtime, fromAdmin: true},
+                success: function (data) {
+                    console.log(data);
 
-                for (var i = 0, len = data.length; i < len; i++) {
-                    appendMessage("Visiteur", data[i].content, data[i].date, data[i].time);
+                    for (var i = 0, len = data.length; i < len; i++) {
+                        appendMessage("Visiteur", data[i].content, data[i].date, data[i].time);
 
-                    if (i == (len - 1))
-                        var lastMicrotime = data[i].microtime;
+                        if (i == (len - 1))
+                            var lastMicrotime = data[i].microtime;
+                    }
+
+                    pollChat(visitorId, lastMicrotime);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    if (textStatus != "abort") {
+                        setTimeout("Piwik_Chat_Popout.pollChat('" + visitorId + "', '" + microtime + "')", 15000);
+                    }
                 }
-
-                pollChat(visitorId, lastMicrotime);
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                if (textStatus != "abort") {
-                    setTimeout("Piwik_Chat_Popout.pollChat('" + visitorId + "', '" + microtime + "')", 15000);
-                }
-            }
-        });
+            });
+        }
     }
 
     function checkNewMessage(firstLaunch, microtime) {
+        if(getQueryParams("module") == "coreHome"){
 
-        xhrRequests['pollUnread'] = $.ajax({
-            type: "GET",
-            url: "/index.php",
-            dataType: "json",
-            cache: false,
-            data: {module: 'API', method: 'Chat.poll', idSite: piwik.idSite, format: 'json', microtime: microtime, fromAdmin: true},
-            success: function (data) {
+            xhrRequests['pollUnread'] = $.ajax({
+                type: "GET",
+                url: "/index.php",
+                dataType: "json",
+                cache: false,
+                data: {module: 'API', method: 'Chat.poll', idSite: piwik.idSite, format: 'json', microtime: microtime, fromAdmin: true},
+                success: function (data) {
 
-                var pendingMessages = getPendingMessages(),
-                    shouldWePlaySound = shouldWeDisplayNotif = false;
+                    var pendingMessages = getPendingMessages(),
+                        shouldWePlaySound = shouldWeDisplayNotif = false;
 
-                for (var i = 0, len = data.length; i < len; i++) {
+                    for (var i = 0, len = data.length; i < len; i++) {
 
-                    var currentRecord = data[i]
-                    visitorId = currentRecord.idvisitor;
+                        var currentRecord = data[i]
+                        visitorId = currentRecord.idvisitor;
 
-                    if (!pendingMessages[visitorId] || currentRecord.lastsent > pendingMessages[visitorId].lastsent) {
-                        shouldWePlaySound = true;
+                        if (!pendingMessages[visitorId] || currentRecord.lastsent > pendingMessages[visitorId].lastsent) {
+                            shouldWePlaySound = true;
 
-                        if (broadcast.getHash().match(/^module=Chat&action=index/g)) {
-                            var getOldRow = $('.list-conversations').find("[data-visitor-id='" + visitorId + "']");
+                            if (broadcast.getHash().match(/^module=Chat&action=index/g)) {
+                                var getOldRow = $('.list-conversations').find("[data-visitor-id='" + visitorId + "']");
 
-                            if (getOldRow.length > 0) {
-                                var clone = getOldRow.clone();
-                                getOldRow.remove();
+                                if (getOldRow.length > 0) {
+                                    var clone = getOldRow.clone();
+                                    getOldRow.remove();
 
-                                $('.list-conversations > tbody').prepend('<tr class="unread" data-visitor-id="' + visitorId + '">' + $(clone).html() + '</tr>');
-                            } else {
-                                var clone = $('.list-conversations').find("tr").last().clone();
-                                clone.children('.idvisitor').html(visitorId);
-                                clone.children('.content').children('a').attr('data-visitor-id', visitorId);
+                                    $('.list-conversations > tbody').prepend('<tr class="unread" data-visitor-id="' + visitorId + '">' + $(clone).html() + '</tr>');
+                                } else {
+                                    var clone = $('.list-conversations').find("tr").last().clone();
+                                    clone.children('.idvisitor').html(visitorId);
+                                    clone.children('.content').children('a').attr('data-visitor-id', visitorId);
 
-                                $('.list-conversations > tbody').prepend('<tr class="unread" data-visitor-id="' + visitorId + '">' + $(clone).html() + '</tr>');
+                                    $('.list-conversations > tbody').prepend('<tr class="unread" data-visitor-id="' + visitorId + '">' + $(clone).html() + '</tr>');
+                                }
+
+
+                                $.get('/index.php', {module: 'API', method: 'Chat.getVisitorLastMessage', idSite: piwik.idSite, visitorId: visitorId, format: 'json'}, function (msg) {
+                                    $('.list-conversations').find("[data-visitor-id='" + visitorId + "']").children('.content').children('a').html(msg[0].content);
+                                    $('.list-conversations').find("[data-visitor-id='" + visitorId + "']").children('.name').html(msg[0].name);
+                                    $('.list-conversations').find("[data-visitor-id='" + visitorId + "']").children('.date').html(msg[0].date + " " + msg[0].time);
+                                }, 'json');
                             }
 
-
-                            $.get('/index.php', {module: 'API', method: 'Chat.getVisitorLastMessage', idSite: piwik.idSite, visitorId: visitorId, format: 'json'}, function (msg) {
-                                $('.list-conversations').find("[data-visitor-id='" + visitorId + "']").children('.content').children('a').html(msg[0].content);
-                                $('.list-conversations').find("[data-visitor-id='" + visitorId + "']").children('.name').html(msg[0].name);
-                                $('.list-conversations').find("[data-visitor-id='" + visitorId + "']").children('.date').html(msg[0].date + " " + msg[0].time);
-                            }, 'json');
-                        }
-
-                        if (!broadcast.getHashFromUrl().match(new RegExp(visitorId))) {
-                            shouldWeDisplayNotif = true;
+                            if (!broadcast.getHashFromUrl().match(new RegExp(visitorId))) {
+                                shouldWeDisplayNotif = true;
+                            }
                         }
                     }
+
+                    if (shouldWePlaySound) {
+                        playSound('notification');
+                    }
+
+                    if (!$('#Chat > a').hasClass('new-messages') && shouldWeDisplayNotif)
+                        $('#Chat > a, #Chat_index > a').addClass('new-messages');
+
+
+                    setPendingMessages(data);
+                    checkNewMessage(false, microtime);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    if (textStatus != "abort") {
+                        setTimeout("Piwik_Chat_Popout.checkNewMessage(false, '" + microtime + "')", 15000);
+                    }
                 }
-
-                if (shouldWePlaySound) {
-                    playSound('notification');
-                }
-
-                if (!$('#Chat > a').hasClass('new-messages') && shouldWeDisplayNotif)
-                    $('#Chat > a, #Chat_index > a').addClass('new-messages');
-
-
-                setPendingMessages(data);
-                checkNewMessage(false, microtime);
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                if (textStatus != "abort") {
-                    setTimeout("Piwik_Chat_Popout.checkNewMessage(false, '" + microtime + "')", 15000);
-                }
-            }
-        });
+            });
+        }
     }
 
     function playSound(type) {
