@@ -25,6 +25,12 @@
         "StaffOnline": "Staff en ligne",
         "HasQuit": "a quitté cette session.",
         "HasJoin": "a rejoint cette session.",
+        "ThanksForInstall": "Merci d'avoir installé le plugin Chat pour Piwik !",
+        "EndInstall": "Fin de l'installation",
+        "EndInstallWhatToDo": "Assurez-vous que ce code est sur toutes les pages de votre site, après le code de suivi de Piwik, et avant la balise </body>.",
+        "HowToUse": "Utilisation",
+        "HowToUseDesc": "La popup Profil Visiteur de votre Piwik a été modifié par le plugin, de sorte que vous puissiez converser avec un visiteur directement depuis celle-ci.",
+        "CloseAndNeverOpenAgain": "Fermer cette fenêtre et ne plus la ré-ouvrir",
         "": "",
         "": ""
     }

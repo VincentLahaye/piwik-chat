@@ -15,16 +15,11 @@ use Piwik\Common;
 use Piwik\Db;
 use Piwik\Piwik;
 use Piwik\Plugins\Goals\API as APIGoals;
-use Piwik\Segment;
 use Piwik\Tracker;
-use Piwik\Tracker\VisitExcluded;
 use Piwik\Tracker\Visitor;
 use Piwik\Url;
 use Piwik\UrlHelper;
 use Piwik\View;
-use UserAgentParser;
-
-//require_once PIWIK_INCLUDE_PATH . '/plugins/Chat/Visit.php';
 
 define('PIWIK_ENABLE_TRACKING', true);
 $GLOBALS['PIWIK_TRACKER_MODE'] = false;
@@ -50,6 +45,9 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         $view = new View('@Chat/listConversations.twig');
         $view->messages = $messages;
         $view->unread = $unread;
+
+        $settings = new Settings('Chat');
+        $view->displayHelp = $settings->displayHelp->getValue();
 
         return $view->render();
     }
@@ -174,6 +172,14 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
     {
         $view = new View('@Chat/help.twig');
         return $view->render();
+    }
+
+    public function toggleHelpPopup()
+    {
+        $settings = new Settings('Chat');
+        $state = !$settings->displayHelp->getValue();
+        $settings->displayHelp->setValue($state);
+        $settings->save();
     }
 
     /*public function automaticmessages()

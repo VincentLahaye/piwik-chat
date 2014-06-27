@@ -25,6 +25,12 @@
         "StaffOnline": "Staff online",
         "HasQuit": "has quit this session.",
         "HasJoin": "has join this session.",
+        "ThanksForInstall": "Thank you for installing this Chat plugin for Piwik !",
+        "EndInstall": "End of installation",
+        "EndInstallWhatToDo": "Ensure that this code is on every pages of your website, after the Piwik's tracking code and before the </body> tag.",
+        "HowToUse": "How to use",
+        "HowToUseDesc": "The VisitorProfile popup has been modified by the plugin, in order for you to chat directly with your customers, through the new Chat tab.",
+        "CloseAndNeverOpenAgain": "Close this popup and never open it again",
         "": "",
         "": ""
     }

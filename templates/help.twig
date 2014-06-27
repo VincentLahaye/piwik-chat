@@ -1,1 +1,60 @@
-Help
+<style>
+    .javascript-output-section textarea {
+        width: 100%;
+        display: block;
+        color: #111;
+        font-family: "Courier New",Courier,monospace;
+        box-sizing: border-box;
+        height: 200px;
+        font-size: 15px;
+    }
+</style>
+<script>
+    $('#javascript-text>textarea').click(function () {
+        $(this).select();
+    });
+
+    $('#close-chat-help-popup').click(function () {
+        (function (require) {
+
+            var Piwik_Popover = require('Piwik_Popover');
+            Piwik_Popover.close();
+
+            var ajaxHelper = require('ajaxHelper');
+
+            var ajax = new ajaxHelper();
+            ajax.setUrl("index.php?module=Chat&action=toggleHelpPopup");
+            ajax.send();
+
+        })(require);
+    });
+</script>
+
+<div style="margin: 0 20px;">
+    <h3 style="margin: 20px 0; color: #C00; text-align: center;">{{ 'Chat_ThanksForInstall'|translate }}</h3>
+    <div class="javascript-output-section">
+        <h4>{{ 'Chat_EndInstall'|translate }}</h4>
+
+        <p class="form-description">{{ 'Chat_EndInstallWhatToDo'|translate }}</p>
+
+        <div id="javascript-text">
+            <textarea><!-- Piwik Chat -->
+<script type="text/javascript">
+    (function() {
+        var u="{{piwikUrl}}";
+        if("https:" == document.location.protocol) u.replace("http", "https");
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+        g.defer=true; g.async=true; g.src=u+'plugins/Chat/javascripts/client/client.js'; s.parentNode.insertBefore(g,s);
+    })();
+</script>
+<!-- End Piwik Chat Code --></textarea>
+        </div>
+        <br>
+    </div>
+    <h4>{{ 'Chat_HowToUse'|translate }}</h4>
+    <p>{{ 'Chat_HowToUseDesc'|translate }}</p>
+
+    <div class="chat-help-footer">
+        <input value="{{ 'Chat_CloseAndNeverOpenAgain'|translate }}" id="close-chat-help-popup" class="submit" type="submit" />
+    </div>
+</div>
