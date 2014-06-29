@@ -133,3 +133,7 @@
 .clearfix {
     clear: both;
 }
+
+.visitor-profile p:last-child{
+    padding-bottom: 10px;
+}

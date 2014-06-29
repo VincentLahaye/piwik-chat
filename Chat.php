@@ -28,6 +28,7 @@ class Chat extends \Piwik\Plugin
             'AssetManager.getJavaScriptFiles' => 'getJsFiles',
             'AssetManager.getStylesheetFiles' => 'getCssFiles',
             'Menu.Reporting.addItems' => 'getReportingMenuItems',
+            'Translate.getClientSideTranslationKeys' => 'getClientSideTranslationKeys',
         );
     }
 
@@ -146,5 +147,10 @@ class Chat extends \Piwik\Plugin
         } catch (Exception $e) {
             throw $e;
         }
+    }
+
+    public function getClientSideTranslationKeys(&$translationKeys)
+    {
+        $translationKeys[] = 'Chat_Visitor';
     }
 }
