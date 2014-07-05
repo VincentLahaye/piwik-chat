@@ -124,8 +124,9 @@ class Conversation
 			(SELECT t3.name FROM " . Common::prefixTable('chat_personnal_informations') . " AS t3 WHERE t3.idvisitor = t1.idvisitor) AS name,
 			(SELECT t3.email FROM " . Common::prefixTable('chat_personnal_informations') . " AS t3 WHERE t3.idvisitor = t1.idvisitor) AS email
 		FROM " . Common::prefixTable('chat') . " AS t1
+		WHERE idsite = ?
 		GROUP BY idvisitor
-		ORDER BY microtime DESC");
+		ORDER BY microtime DESC", array($this->idsite));
 
         $rows = $this->formatRows($rows);
 
