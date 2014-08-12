@@ -298,9 +298,14 @@ form {
 .chat-header .circle {
     border-radius: 4px;
     height: 8px;
-    margin: 11px 7px 0 -15px;
+    left: -15px;
     position: absolute;
+    top: 4px;
     width: 8px;
+}
+
+.chat-header .header-title{
+    position: relative;
 }
 
 .circle.green {

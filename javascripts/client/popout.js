@@ -33,7 +33,7 @@ var Piwik_Chat_Popout = (function ($) {
                 cache: false,
                 data: {module: 'API', method: 'Chat.isStaffOnline', idSite: query.idsite, format: 'json'},
                 success: function (result) {
-                    if (result.value == true) {
+                    if (result.value === true) {
                         $('.is-staff-online').html('<div class="yes"><span class="circle"></span> ' + __tr['StaffOnline'] + '</div>');
                         $('.chat-header .circle').show();
                         $('.chat-state-3 .notice').hide();

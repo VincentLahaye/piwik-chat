@@ -12,15 +12,17 @@
 <div class="chat-container chat-state-1" {% if state == 1 %}style="display:block;"{% endif %}>
     <div class="chat-wrapper">
         <div class="chat-header">
-            <span class="circle green"
-                  style="{% if isStaffOnline == 0 %}display:none{% endif %}"></span> {{ 'Chat_CustomerHelp'|translate }}
+            <span class="header-title">
+                <span class="circle green" style="{% if isStaffOnline == 0 %}display:none{% endif %}"></span>
+                {{ 'Chat_CustomerHelp'|translate }}
+            </span>
             <span class="action-logo">+</span>
         </div>
     </div>
 </div>
 
 <div class="chat-container chat-state-2" {% if state == 2 %}style="display:block;"{% endif %}>
-    <div class="is-staff-online">{% if isStaffOnline == 1 %}
+    <div class="is-staff-online header-title">{% if isStaffOnline == 1 %}
             <div class="yes"><span class="circle"></span> {{ 'Chat_StaffOnline'|translate }}</div>{% endif %}</div>
     <div class="chat-state-2-content">
         <div class="chat-state-2-col-1">
@@ -44,8 +46,10 @@
     <form id="form-chat-state-3">
         <div class="chat-wrapper">
             <div class="chat-header">
-                <span class="circle green"
-                      style="{% if isStaffOnline == 0 %}display:none{% endif %}"></span> {{ 'Chat_CustomerHelp'|translate }}
+                <span class="header-title">
+                    <span class="circle green" style="{% if isStaffOnline == 0 %}display:none{% endif %}"></span>
+                    {{ 'Chat_CustomerHelp'|translate }}
+                </span>
             </div>
             <div class="chat-content-block">
                 <p class="notice"
@@ -74,8 +78,10 @@
 <div class="chat-container chat-state-4" {% if state == 4 %}style="display:block;"{% endif %}>
     <div class="chat-wrapper">
         <div class="chat-header">
-            <span class="circle green"
-                  style="{% if isStaffOnline == 0 %}display:none{% endif %}"></span> {{ 'Chat_CustomerHelp'|translate }}
+            <span class="header-title">
+                <span class="circle green" style="{% if isStaffOnline == 0 %}display:none{% endif %}"></span>
+                {{ 'Chat_CustomerHelp'|translate }}
+            </span>
             <span class="action-logo">-</span>
         </div>
         <div id="chat-conversation">
