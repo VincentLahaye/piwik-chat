@@ -1,7 +1,6 @@
 var Piwik_Chat_Popout = (function ($) {
 
     var __tr,
-        socket,
         state,
         staffAlreadyAfk,
         lastNameStaff;
@@ -52,13 +51,9 @@ var Piwik_Chat_Popout = (function ($) {
 
     function initialize(getState) {
         bindEventCallbacks();
-
         state = getState;
-
         scrollDown();
-
         isStaffAFK();
-
         poll();
     }
 
@@ -157,7 +152,7 @@ var Piwik_Chat_Popout = (function ($) {
                     poll(lastMicrotime);
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    // alert("error: "+textStatus + " "+ errorThrown );
+                    console.log("error: "+ textStatus + " "+ errorThrown);
                     setTimeout("Piwik_Chat_Popout.poll()", 15000);
                 }
             });
@@ -195,10 +190,10 @@ var Piwik_Chat_Popout = (function ($) {
 
             $.ajax({
                 type: "POST",
-                url: "/?module=API&method=Chat.sendMessage",
-                dataType: "xml",
+                url: "/?module=API&method=Chat.sendMessage&format=json",
+                dataType: "json",
                 cache: false,
-                data: {visitorId: idVisitor, idSite: 1, message: message},
+                data: {visitorId: idVisitor, idSite: query.idsite, message: message},
                 success: function (data) {
                     console.log(data);
                 },
@@ -286,7 +281,7 @@ var Piwik_Chat_Popout = (function ($) {
             url: "/?module=API&method=Chat.updatePersonnalInformations",
             dataType: "xml",
             cache: false,
-            data: {visitorId: idVisitor, idSite: 1, name: name, email: email},
+            data: {visitorId: idVisitor, idSite: query.idsite, name: name, email: email},
             success: function (data) {
                 console.log(data);
             },
