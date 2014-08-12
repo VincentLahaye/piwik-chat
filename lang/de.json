@@ -1,0 +1,36 @@
+{
+    "Chat": {
+        "Chat": "Chat",
+        "You": "Sie",
+        "WriteYourMessageHere": "Schreiben Sie ihre Nachricht hier und drücken Enter.",
+        "YourMessageHere": "Ihre Nachricht",
+        "CustomerHelp": "Kundensupport",
+        "Visitor": "Besucher",
+        "Date": "Datum",
+        "VisitorID": "Besucher ID",
+        "LastMessage": "Letzte Nachricht",
+        "AQuestion?": "Eine Frage?",
+        "AnIssue?": "Ein Fehler?",
+        "ChatWithUs": "Chatten Sie mit uns!",
+        "NotAvailable": "Wir sind derzeit nicht verfügbar. Wenn Sie uns eine Nachricht hinterlassen, werden wir uns mit Ihnen entsprechend in Verbindung setzen.",
+        "Name": "Name",
+        "EmailAddress": "E-Mail Addresse",
+        "Message": "Nachricht",
+        "PresentYourself": "Ihr Name / Ihre E-Mailadresse?",
+        "SendMyMessage": "Nachricht senden",
+        "PersonalInformations": "Persönliche Informationen",
+        "Phone": "Telefon",
+        "Comments": "Kommentar",
+        "Save": "Speichern",
+        "StaffOnline": "Mitarbeiter online",
+        "HasQuit": "hat die Sitzung verlassen.",
+        "HasJoin": "hat die Sitzung betreten.",
+        "ThanksForInstall": "Danke, dass Sie dieses Chat Plugin für Piwik installiert haben!",
+        "EndInstall": "Ende der Installation",
+        "EndInstallWhatToDo": "Stellen Sie sicher, dass Sie diesen Code auf allen ihren Seiten nach ihren Piwik Trackingcode platzieren.",
+        "HowToUse": "Howto / Einsatz",
+        "HowToUseDesc": "Die Besucherprofile wurden automatisch vom Piwik Chat Plugin bearbeitet um es ihnen über den neuen Chat Tab zu ermöglichen Ihre Besucher / Kunden direkt anzuschreiben."
+        "": "",
+        "": ""
+    }
+}
