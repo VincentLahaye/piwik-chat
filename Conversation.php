@@ -311,7 +311,7 @@ class Conversation
     public function getLastPoll($login = false)
     {
         $query = ($login) ? "WHERE login = ?" : "ORDER BY last_poll DESC LIMIT 1";
-        return Db::fetchOne("SELECT last_poll FROM " . Common::prefixTable('user') . " " . $query, array($login));
+        return Db::fetchOne("SELECT last_poll FROM " . Common::prefixTable('user') . " " . $query, ($login) ? array($login) : array());
     }
 
     public function isStaffOnline()
