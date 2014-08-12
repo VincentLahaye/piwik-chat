@@ -2,8 +2,8 @@
 <html>
 <head>
     <title>{{ 'Chat_CustomerHelp'|translate }}</title>
-    <link href="/plugins/Chat/stylesheets/client/popout.css" rel="stylesheet">
-    <link href="/plugins/Chat/stylesheets/client/font-awesome.min.css" rel="stylesheet">
+    <link href="{{ piwikUrl }}plugins/Chat/stylesheets/client/popout.css" rel="stylesheet">
+    <link href="{{ piwikUrl }}plugins/Chat/stylesheets/client/font-awesome.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -158,12 +158,12 @@
         </div>
     </div>
 </div>
-<script src="/plugins/Chat/javascripts/client/jquery.min.js"></script>
-<script src="/plugins/Chat/javascripts/client/easyXDM.min.js"></script>
+<script src="{{ piwikUrl }}plugins/Chat/javascripts/client/jquery.min.js"></script>
+<script src="{{ piwikUrl }}plugins/Chat/javascripts/client/easyXDM.min.js"></script>
 <script>
     siteMainUrl = "{{ siteUrl }}";
 </script>
-<script src="/plugins/Chat/javascripts/client/popout.js"></script>
+<script src="{{ piwikUrl }}plugins/Chat/javascripts/client/popout.js"></script>
 <script>
     $(document).ready(function () {
         Piwik_Chat_Popout.setTranslationTable({
