@@ -11,7 +11,10 @@
 namespace Piwik\Plugins\Chat;
 
 use Piwik\Common;
+use Piwik\Config;
 use Piwik\Db;
+use Piwik\Mail;
+use Zend_Mime;
 
 /**
  * @package Chat
@@ -50,6 +53,7 @@ class Conversation
 
         if (!$fromAdmin) {
             $this->setIsNew($microtime);
+            $this->sendNotificationToAdmin($sanitizeContent, $this->idvisitor);
         }
 
         return $queryResult;
@@ -167,6 +171,58 @@ class Conversation
         return false;
     }
 
+    public function getUsersBySite()
+    {
+        $getRegularUsers = Db::fetchAll("SELECT login,
+        (SELECT email FROM ". Common::prefixTable('user') ." WHERE login = acc.login) AS email
+        FROM " . Common::prefixTable('access') . " AS acc WHERE idsite = ?", array($this->idsite));
+        $getSuperUsers = Db::fetchAll("SELECT login,email FROM " . Common::prefixTable('user') . " WHERE superuser_access = 1");
+
+        $getUsers = array_merge($getRegularUsers, $getSuperUsers);
+
+        return $getUsers;
+    }
+
+    public function sendNotificationToAdmin($message)
+    {
+        $visitorInfo = $this->getPersonnalInformations();
+
+        $subject = "New message on " . $this->getSiteName();
+
+        $mail = new Mail();
+        $mail->setFrom(Config::getInstance()->General['noreply_email_address'], "Piwik Chat");
+        $mail->setSubject($subject);
+
+        $mail->setBodyHtml("Name : ". $visitorInfo['name'] ."<br />
+        Email : ". $visitorInfo['email'] ."<br />
+        Phone : ". $visitorInfo['phone'] ."<br />
+        Comments : ". $visitorInfo['comments'] ."<br />
+        <br /><br />
+        Message:<br />$message");
+
+        foreach ($this->getUsersBySite() as $user) {
+            if (empty($user['email'])) {
+                continue;
+            }
+
+            if($this->isStaffOnline($user['login'])){
+                continue;
+            }
+
+            $mail->addTo($user['email']);
+
+            try {
+                $mail->send();
+            } catch (Exception $e) {
+                throw new Exception("An error occured while sending '$subject' " .
+                    " to " . implode(', ', $mail->getRecipients()) .
+                    ". Error was '" . $e->getMessage() . "'");
+            }
+
+            $mail->clearRecipients();
+        }
+    }
+
     /**************************************************************************
      * History Admin
      **************************************************************************/
@@ -186,12 +242,7 @@ class Conversation
 
     public function setIsNew($microtime)
     {
-        $getRegularUsers = Db::fetchAll("SELECT login FROM " . Common::prefixTable('access') . " WHERE idsite = ?", array($this->idsite));
-        $getSuperUsers = Db::fetchAll("SELECT login FROM " . Common::prefixTable('user') . " WHERE superuser_access = 1");
-
-        $getUsers = array_merge($getRegularUsers, $getSuperUsers);
-
-        foreach ($getUsers as $user) {
+        foreach ($this->getUsersBySite() as $user) {
 
             $arguments = array(
                 $user['login'],
@@ -201,6 +252,7 @@ class Conversation
             );
 
             Db::query("INSERT INTO " . Common::prefixTable('chat_history_admin') . " SET login = ?, idvisitor = ?, lastsent = ? ON DUPLICATE KEY UPDATE lastsent = ?", $arguments);
+
         }
 
         return true;
@@ -314,10 +366,10 @@ class Conversation
         return Db::fetchOne("SELECT last_poll FROM " . Common::prefixTable('user') . " " . $query, ($login) ? array($login) : array());
     }
 
-    public function isStaffOnline()
+    public function isStaffOnline($login = false)
     {
         $timeout = 2; // in minutes
-        $lastPoll = $this->getLastPoll();
+        $lastPoll = $this->getLastPoll($login);
 
         return !($lastPoll < (microtime(true) - ($timeout * 60)));
     }
@@ -328,6 +380,11 @@ class Conversation
     public function getSiteMainUrl()
     {
         return Db::fetchOne("SELECT main_url FROM " . Common::prefixTable('site') . " WHERE idsite = ?", array($this->idsite));
+    }
+
+    public function getSiteName()
+    {
+        return Db::fetchOne("SELECT name FROM " . Common::prefixTable('site') . " WHERE idsite = ?", array($this->idsite));
     }
 
     /**************************************************************************
