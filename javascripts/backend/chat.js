@@ -279,7 +279,6 @@ Piwik_Chat_Admin = (function ($, require) {
             delete this.$element;
 
             this._baseDestroyCalled = true;
-            globalAjaxQueue.abort();
         },
 
         _bindEventCallbacks: function () {
