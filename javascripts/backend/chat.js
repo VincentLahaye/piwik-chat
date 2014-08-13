@@ -5,38 +5,45 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html GPL v3 or later
  */
 
-$.fn.serializeObject = function()
-{
-    var o = {};
-    var a = this.serializeArray();
-    $.each(a, function() {
-        if (o[this.name] !== undefined) {
-            if (!o[this.name].push) {
-                o[this.name] = [o[this.name]];
+$.fn.serializeObject = function(){
+    var obj = {},
+        arr = this.serializeArray();
+
+    $.each(arr, function() {
+        if (obj[this.name] !== undefined) {
+            if (!obj[this.name].push) {
+                obj[this.name] = [obj[this.name]];
             }
-            o[this.name].push(this.value || '');
+            obj[this.name].push(this.value || '');
         } else {
-            o[this.name] = this.value || '';
+            obj[this.name] = this.value || '';
         }
     });
-    return o;
+
+    return obj;
 };
 
 $(document).ready(function () {
     Piwik_Chat_Admin.poll(true);
+
+    $(window).focus(function(){
+        Piwik_Chat_Admin.stopTitleNotification();
+    })
 });
 
 Piwik_Chat_Admin = (function ($, require) {
-    var piwik = require('piwik');
+    var piwik = require('piwik'),
+        winTitle = window.document.title,
+        shouldStopTitleNotification = false;
 
     function scrollDown() {
-        var objDiv = document.getElementById("chat-conversation");
-        objDiv.scrollTop = objDiv.scrollHeight;
-
-        var totalHeight = $('.visitor-profile-overview').height(),
+        var objDiv = document.getElementById("chat-conversation"),
+            totalHeight = $('.visitor-profile-overview').height(),
             tabHeaderHeight = $('.visitor-profile-pages-visited').height(),
             textareaHeight = $('.visitor-profile-chat-conversation-textarea').height(),
             chatConvHeight = totalHeight - tabHeaderHeight - textareaHeight - 95;
+
+        objDiv.scrollTop = objDiv.scrollHeight;
 
         $('#chat-conversation').height(chatConvHeight);
     }
@@ -74,7 +81,7 @@ Piwik_Chat_Admin = (function ($, require) {
 
             var ajax = new ajaxHelper();
             ajax.setUrl("index.php");
-            ajax.addParams({module: 'API', method: 'Chat.sendMessage'}, 'GET')
+            ajax.addParams({module: 'API', method: 'Chat.sendMessage', format: 'json'}, 'GET')
             ajax.addParams({visitorId: idVisitor, idSite: piwik.idSite, message: message, fromAdmin: true}, 'POST')
             ajax.setCallback(function (data) {
                 console.log(data);
@@ -99,74 +106,86 @@ Piwik_Chat_Admin = (function ($, require) {
                 url: "/index.php",
                 dataType: "json",
                 cache: false,
-                data: {module: 'API', method: 'Chat.poll', idSite: piwik.idSite, format: 'json', microtime: microtime, fromAdmin: true},
+                data: {module: 'API', method: 'Chat.poll', idSite: piwik.idSite, microtime: microtime, fromAdmin: true, format: 'json'},
                 success: function (data) {
                     var pendingMessages = getPendingMessages(),
                         shouldWePlaySound = false,
                         shouldWeDisplayNotif = false,
                         visitorIdFocused = $('.visitor-profile').attr('data-visitor-id');
 
-                    for (var i = 0, len = data.length; i < len; i++) {
 
-                        var currentRecord = data[i],
-                            visitorId = currentRecord.idvisitor;
+                    poll(microtime);
 
-                        if (!pendingMessages[visitorId] || currentRecord.lastsent > pendingMessages[visitorId].lastsent) {
-                            shouldWePlaySound = true;
-
-                            /**
-                             * If we are on the Chat module index
-                             */
-                            if (broadcast.getHash().match(/module=Chat&action=index/g).length > 0) {
-                                var getOldRow = $('.list-conversations').find("[data-visitor-id='" + visitorId + "']");
-
-                                if (getOldRow.length > 0) {
-                                    var clone = getOldRow.clone();
-                                    getOldRow.remove();
-
-                                    $('.list-conversations > tbody').prepend('<tr class="unread" data-visitor-id="' + visitorId + '">' + $(clone).html() + '</tr>');
-                                } else {
-                                    var clone = $('.list-conversations').find("tr").last().clone();
-                                    clone.children('.idvisitor').html(visitorId);
-                                    clone.children('.content').children('a').attr('data-visitor-id', visitorId);
-
-                                    $('.list-conversations > tbody').prepend('<tr class="unread" data-visitor-id="' + visitorId + '">' + $(clone).html() + '</tr>');
-                                }
-
-                                var ajaxHelper = require('ajaxHelper');
-
-                                var ajax = new ajaxHelper();
-                                ajax.setUrl("index.php");
-                                ajax.addParams({module: 'API', method: 'Chat.getVisitorLastMessage', idSite: piwik.idSite, visitorId: visitorId, format: 'json'}, 'GET');
-                                ajax.addParams($(this).serializeObject(), 'POST');
-                                ajax.setCallback(function (msg) {
-                                    var domParent = $('.list-conversations').find("[data-visitor-id='" + visitorId + "']");
-                                    domParent.children('.content').children('a').html(msg[0].content);
-                                    domParent.children('.name').html(msg[0].name);
-                                    domParent.children('.date').html(msg[0].date + " " + msg[0].time);
-                                });
-                                ajax.setFormat('json');
-                                ajax.send();
-                            }
-
-                            /**
-                             * If the VisitorProfile popup if open
-                             */
-                            if(visitorIdFocused && visitorIdFocused == visitorId){
-                                appendMessage(_pk_translate('Chat_Visitor'), data[i].content, data[i].date, data[i].time);
-
-                                // Remove 'unread' class
-                                $('.list-conversations').find("[data-visitor-id='" + visitorId + "']").removeClass('unread');
-                            }
-
-                            if (!broadcast.getHashFromUrl().match(new RegExp(visitorId))) {
-                                shouldWeDisplayNotif = true;
-                            }
-                        }
+                    if(data.value === false || data.length < 1){
+                        return false;
                     }
 
-                    if (shouldWePlaySound == true) {
-                        playSound('notification');
+                    playSound('notification');
+                    shouldStopTitleNotification = false;
+                    showTitleNotification();
+
+                    if (broadcast.getHash().match(/module=Chat&action=index/g) != null) {
+
+                        for (var i = 0, len = data.length; i < len; i++) {
+
+                            var currentRecord = data[i],
+                                visitorId = currentRecord.idvisitor;
+
+                            if (!pendingMessages[visitorId] || currentRecord.lastsent > pendingMessages[visitorId].lastsent) {
+                                //shouldWePlaySound = true;
+
+                                /**
+                                 * If we are on the Chat module index
+                                 */
+                                if (broadcast.getHash().match(/module=Chat&action=index/g).length != null) {
+                                    var getOldRow = $('.list-conversations').find("[data-visitor-id='" + visitorId + "']");
+
+                                    if (getOldRow.length > 0) {
+                                        var clone = getOldRow.clone();
+                                        getOldRow.remove();
+
+                                        $('.list-conversations > tbody').prepend('<tr class="unread" data-visitor-id="' + visitorId + '">' + $(clone).html() + '</tr>');
+                                    } else {
+                                        var clone = $('.list-conversations').find("tr").last().clone();
+                                        clone.children('.idvisitor').html(visitorId);
+                                        clone.children('.content').children('a').attr('data-visitor-id', visitorId);
+
+                                        $('.list-conversations > tbody').prepend('<tr class="unread" data-visitor-id="' + visitorId + '">' + $(clone).html() + '</tr>');
+                                    }
+
+                                    var ajaxHelper = require('ajaxHelper');
+
+                                    var ajax = new ajaxHelper();
+                                    ajax.setUrl("index.php");
+                                    ajax.addParams({module: 'API', method: 'Chat.getVisitorLastMessage', idSite: piwik.idSite, visitorId: visitorId, format: 'json'}, 'GET');
+                                    ajax.addParams($(this).serializeObject(), 'POST');
+                                    ajax.setCallback(function (msg) {
+                                        var domParent = $('.list-conversations').find("[data-visitor-id='" + visitorId + "']");
+                                        domParent.children('.content').children('a').html(msg[0].content);
+                                        domParent.children('.name').html(msg[0].name);
+                                        domParent.children('.date').html(msg[0].date + " " + msg[0].time);
+                                    });
+                                    ajax.setFormat('json');
+                                    ajax.send();
+                                }
+
+                                /**
+                                 * If the VisitorProfile popup if open
+                                 */
+                                if(visitorIdFocused && visitorIdFocused == visitorId){
+                                    appendMessage(_pk_translate('Chat_Visitor'), data[i].content, data[i].date, data[i].time);
+
+                                    // Remove 'unread' class
+                                    $('.list-conversations').find("[data-visitor-id='" + visitorId + "']").removeClass('unread');
+                                }
+
+                                if (!broadcast.getHashFromUrl().match(new RegExp(visitorId))) {
+                                    shouldWeDisplayNotif = true;
+                                }
+                            }
+                        }
+                    } else {
+                        shouldWeDisplayNotif = true;
                     }
 
                     if (!$('#Chat > a').hasClass('new-messages') && shouldWeDisplayNotif) {
@@ -174,16 +193,29 @@ Piwik_Chat_Admin = (function ($, require) {
                     }
 
                     setPendingMessages(data);
-                    poll(microtime);
                 }
             });
         }
     }
 
-    function playSound(type) {
+    function showTitleNotification(){
+        if(shouldStopTitleNotification === true){
+            window.document.title = winTitle;
+            return false;
+        }
 
-        var soundFolder = "/plugins/Chat/sounds/";
-        var file;
+        window.document.title = (window.document.title === winTitle) ? "New chat messages! " + winTitle : winTitle;
+
+        setTimeout(function(){ return showTitleNotification(); }, 1000);
+    }
+
+    function stopTitleNotification(){
+        shouldStopTitleNotification = true;
+    }
+
+    function playSound(type) {
+        var soundFolder = "/plugins/Chat/sounds/",
+            file;
 
         switch (type) {
             default:
@@ -203,8 +235,9 @@ Piwik_Chat_Admin = (function ($, require) {
         $(domElement).parent().parent().removeClass('unread');
         broadcast.propagateNewPopoverParameter('visitorProfile', $(domElement).attr('data-visitor-id'), $(domElement).attr('data-goto-chat'));
 
-        if ($('.list-conversations .unread').length == 0)
+        if ($('.list-conversations .unread').length == 0){
             $('#Chat > a, #Chat_index > a').removeClass('new-messages');
+        }
 
         return false;
     }
@@ -232,6 +265,10 @@ Piwik_Chat_Admin = (function ($, require) {
 
         displayHelp: function () {
             return displayHelp();
+        },
+
+        stopTitleNotification: function() {
+            return stopTitleNotification();
         }
     }
 })(jQuery, require);
