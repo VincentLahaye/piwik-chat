@@ -13,12 +13,14 @@ namespace Piwik\Plugins\Chat;
 use Piwik\API\Request;
 use Piwik\Common;
 use Piwik\Db;
+use Piwik\Mail;
 use Piwik\Piwik;
 use Piwik\Plugins\Goals\API as APIGoals;
 use Piwik\Tracker;
 use Piwik\Tracker\Visitor;
 use Piwik\Url;
 use Piwik\UrlHelper;
+use Piwik\Version;
 use Piwik\View;
 
 define('PIWIK_ENABLE_TRACKING', true);
@@ -163,7 +165,7 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         $view->idvisitor = bin2hex($visitorInfo['idvisitor']);
         $view->timeLimit = time() - (2 * 60 * 60);
         $view->isStaffOnline = $conversation->isStaffOnline();
-        $view->siteUrl = $conversation->getSiteMainUrl();
+        $view->siteUrl = Conversation::getSiteMainUrl($idSite);
 
         return $view->render();
     }
@@ -180,6 +182,54 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         $state = !$settings->displayHelp->getValue();
         $settings->displayHelp->setValue($state);
         $settings->save();
+    }
+
+    public function reportBug()
+    {
+        $idSite = Common::getRequestVar('idSite', null, 'int');
+
+        $jsonConfig = json_decode(file_get_contents(getcwd() . '/plugins/Chat/plugin.json'), true);
+
+        $view = new view('@Chat/reportBug.twig');
+        $view->piwikVersion = Version::VERSION;
+        $view->chatVersion = $jsonConfig['version'];
+        $view->email = Piwik::getCurrentUserEmail();
+        $view->website = Conversation::getSiteMainUrl($idSite);
+        $view->idSite = $idSite;
+        $view->displayNotice = Common::getRequestVar('submittedBugReport', '0', 'int');
+
+        return $view->render();
+    }
+
+    public function sendBug()
+    {
+        $idSite = Common::getRequestVar('idSite', null, 'int');
+        $email = Common::getRequestVar('email', null);
+        $name = Common::getRequestVar('name', null);
+        $website = Common::getRequestVar('website', null);
+        $message = Common::getRequestVar('message', null);
+        $jsonConfig = json_decode(file_get_contents(getcwd() . '/plugins/Chat/plugin.json'), true);
+
+        if($idSite != null && $email != null && $name != null && $website != null && $message != null){
+            $mail = new Mail();
+            $mail->setFrom(($email != null) ? $email : Piwik::getCurrentUserEmail(), ($name != null) ? $name : Piwik::getCurrentUserLogin());
+            $mail->setSubject("Bug report");
+
+            $mail->setBodyHtml("Piwik Version : ". Version::VERSION ."<br />
+            Chat Version : ". $jsonConfig['version'] ."<br />
+            Website : ". $website ."<br /><br /><br />
+            Message:<br />" . $message);
+
+            $mail->addTo($jsonConfig['authors'][0]['email']);
+
+            try {
+                $mail->send();
+            } catch (Exception $e) {
+                throw new Exception("An error occured while sending 'Bug Report' to ". implode(', ', $mail->getRecipients()) ." Error was '" . $e->getMessage() . "'");
+            }
+
+            return true;
+        }
     }
 
     /*public function automaticmessages()

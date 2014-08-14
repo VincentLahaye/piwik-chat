@@ -137,3 +137,12 @@
 .visitor-profile p:last-child{
     padding-bottom: 10px;
 }
+
+.disabledInput{
+    background: #EEE !important;
+    cursor: no-drop;
+}
+
+.whatsHappening{
+    margin-left: 20px;
+}

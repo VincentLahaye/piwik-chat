@@ -187,7 +187,7 @@ class Conversation
     {
         $visitorInfo = $this->getPersonnalInformations();
 
-        $subject = "New message on " . $this->getSiteName();
+        $subject = "New message on " . self::getSiteName($this->idsite);
 
         $mail = new Mail();
         $mail->setFrom(Config::getInstance()->General['noreply_email_address'], "Piwik Chat");
@@ -377,14 +377,14 @@ class Conversation
     /**************************************************************************
      * Site
      **************************************************************************/
-    public function getSiteMainUrl()
+    public static function getSiteMainUrl($idsite)
     {
-        return Db::fetchOne("SELECT main_url FROM " . Common::prefixTable('site') . " WHERE idsite = ?", array($this->idsite));
+        return Db::fetchOne("SELECT main_url FROM " . Common::prefixTable('site') . " WHERE idsite = ?", array($idsite));
     }
 
-    public function getSiteName()
+    public static function getSiteName($idsite)
     {
-        return Db::fetchOne("SELECT name FROM " . Common::prefixTable('site') . " WHERE idsite = ?", array($this->idsite));
+        return Db::fetchOne("SELECT name FROM " . Common::prefixTable('site') . " WHERE idsite = ?", array($idsite));
     }
 
     /**************************************************************************

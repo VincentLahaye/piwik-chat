@@ -60,6 +60,14 @@ class Chat extends \Piwik\Plugin
             $order = 12
         );
 
+        \Piwik\Menu\MenuMain::getInstance()->add(
+            $category = 'Chat',
+            $title = 'Report a bug',
+            $urlParams = array('module' => $this->getPluginName(), 'action' => 'reportBug'),
+            $showOnlyIf = Piwik::hasUserSuperUserAccess(),
+            $order = 13
+        );
+
         /*\Piwik\Menu\MenuMain::getInstance()->add(
             $category = 'Chat',
             $title = 'Reports',

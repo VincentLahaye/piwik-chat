@@ -1,0 +1,70 @@
+<h2>Report a bug</h2>
+<br />
+<form method="post" action="/index.php?module=Chat&action=sendBug" id="formSendBug">
+    <input type="hidden" name="idSite" value="{{ idSite }}" />
+    <table class="adminTable" id="">
+        <tbody>
+        <tr>
+            <td style="width: 300px"><label for="piwikVersion">Piwik Version </label></td>
+            <td>
+                <input type="text" disabled="disabled" name="piwikVersion" class="disabledInput" value="{{ piwikVersion }}" style="width: 300px" />
+            </td>
+        </tr>
+        <tr>
+            <td><label for="chatVersion">Chat Plugin Version </label></td>
+            <td>
+                <input type="text" disabled="disabled" name="chatVersion" class="disabledInput" value="{{ chatVersion }}" style="width: 300px" />
+            </td>
+        </tr>
+        <tr>
+            <td><label for="email">Your Email </label></td>
+            <td>
+                <input type="email" name="email" value="{{ email }}" style="width: 300px" />
+            </td>
+        </tr>
+        <tr>
+            <td><label for="website">Your Website (where the chat client is) </label></td>
+            <td>
+                <input type="text" name="website" value="{{ website }}" style="width: 300px" />
+            </td>
+        </tr>
+        <tr>
+            <td><label for="name">Your Name </label></td>
+            <td>
+                <input type="text" name="name" style="width: 300px" />
+            </td>
+        </tr>
+        <tr>
+            <td><label for="message">Bug report </label></td>
+            <td><textarea id="message" name="message" style="width:100%; height: 150px"></textarea></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="submit" /><span class="whatsHappening"></span></td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<script>
+    $('#formSendBug').submit(function(e){
+        e.preventDefault;
+
+        $('.whatsHappening').html('Please wait..');
+
+        var ajaxHelper = require('ajaxHelper');
+
+        var ajax = new ajaxHelper();
+        ajax.setUrl("index.php");
+        ajax.addParams({module: 'Chat', action: 'sendBug'}, 'GET');
+        ajax.addParams($(this).serializeObject(), 'POST');
+        ajax.setCallback(function () {
+            $('#successNotice').show();
+            $('#message').val('');
+            $('.whatsHappening').html('Bug report successfully sent to the developer ! Thank you ;)');
+        });
+        ajax.setFormat('json');
+        ajax.send();
+
+        return false;
+    })
+</script>
