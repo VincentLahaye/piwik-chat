@@ -31,6 +31,23 @@ Soon, a reporting system will be integrated, which will show figures like conver
 After installing the plugin, you have to modify your tracking code. It includes the file "javascripts/client/client.js", which waits for the Tracker() to initialize, then appends an iframe to the page. This iframe requests the "popout" action of the controller, where the plugin tries to identify the visitor based on his visitorID or configID.
 
 ## Changelog
+
+v0.1.6 :
+
++ Add a reporting bug system
+
+
+v0.1.5 :
+
++    Notification system improved
+    +    Add email notification to offline staf members
+    +    Add title notification
+    +    Improve sound and menu notification, now working on all CoreHome module
++    Add german translation
++    Fix wrong inclusion paths on client popout
++    Fix online staff indicator on client popout
+
+
 v0.1 :
 
 +   Basic chat functions with client/server communication and Piwik integration
