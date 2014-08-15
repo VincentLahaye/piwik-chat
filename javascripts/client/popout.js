@@ -1,7 +1,8 @@
-var Piwik_Chat_Popout = (function ($) {
+function Piwik_Chat_Popout () {
 
     var __tr,
         state,
+        socket,
         staffAlreadyAfk,
         lastNameStaff;
 
@@ -13,7 +14,7 @@ var Piwik_Chat_Popout = (function ($) {
     function isStaffAFK() {
         var query = getQueryParams(document.location.search);
 
-        if (state == 4) {
+        if (getState() == 4) {
             var lastTimeMsgStaff = parseInt($(".author:not(:contains('" + __tr['You'] + "'))").last().parent().next().attr('data-microtime'));
 
             if (lastTimeMsgStaff < parseInt((Date.now() / 1000) - (2 * 60 * 60)) && !$("#chat-conversation p.has-quit").last().hasClass('offline')) {
@@ -24,7 +25,7 @@ var Piwik_Chat_Popout = (function ($) {
             }
         }
 
-        if (state != 1) {
+        if (getState() != 1) {
 
             $.ajax({
                 type: "GET",
@@ -46,12 +47,26 @@ var Piwik_Chat_Popout = (function ($) {
             });
         }
 
-        setTimeout(Piwik_Chat_Popout.isStaffAFK(), 20000); // 20 seconds
+        setTimeout(function(){ return isStaffAFK(); }, 20000); // 20 seconds
     }
 
-    function initialize(getState) {
+    function initialize() {
+
+        if($.inArray(getState(), ['1','2','3','4']) === -1){
+            console.log("WTF is this popout state ?!");
+
+            if($('#chat-conversation').children().length == 0){
+                setState(2); // Need some help ?
+            } else {
+                setState(4); // Display conversation
+            }
+        }
+
+        $('.chat-state-' + getState()).show();
+
+        socket.postMessage(getState());
+
         bindEventCallbacks();
-        state = getState;
         scrollDown();
         isStaffAFK();
         poll();
@@ -123,7 +138,7 @@ var Piwik_Chat_Popout = (function ($) {
         var query = getQueryParams(document.location.search),
             shouldWePlaySound = false;
 
-        if (state == 1 || state == 4) {
+        if (getState() == 1 || getState() == 4) {
             $.ajax({
                 type: "GET",
                 url: "/index.php",
@@ -133,7 +148,7 @@ var Piwik_Chat_Popout = (function ($) {
                 success: function (data) {
                     console.log(data);
 
-                    if (state != 4)
+                    if (getState() != 4)
                         maximizePopout();
 
                     for (var i = 0, len = data.length; i < len; i++) {
@@ -153,7 +168,7 @@ var Piwik_Chat_Popout = (function ($) {
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     console.log("error: "+ textStatus + " "+ errorThrown);
-                    setTimeout("Piwik_Chat_Popout.poll()", 15000);
+                    setTimeout(function(){ return poll(); }, 15000);
                 }
             });
         }
@@ -217,7 +232,7 @@ var Piwik_Chat_Popout = (function ($) {
 
         $('.chat-state-3 .name').focus();
 
-        state = 3;
+        setState(3);
     }
 
     function bindEventCallbacks() {
@@ -243,7 +258,7 @@ var Piwik_Chat_Popout = (function ($) {
             updatePersonnalInformations($(this).find('.name').val(), $(this).find('.email').val());
             sendMessage($(this).find('.chat-input'));
 
-            state = 4;
+            setState(4);
             poll();
 
             return false;
@@ -254,9 +269,9 @@ var Piwik_Chat_Popout = (function ($) {
         });
 
         $('.chat-state-4 .action-logo').on('click', function (e) {
-            state = 1;
+            setState(1);
 
-            $.get("/?module=API&method=Chat.setPopoutState&state=" + state);
+            //$.get("/?module=API&method=Chat.setPopoutState&state=" + state);
 
             $('.chat-state-4').hide();
             $('.chat-state-1').show();
@@ -264,9 +279,9 @@ var Piwik_Chat_Popout = (function ($) {
     }
 
     function maximizePopout() {
-        state = 4;
+        setState(4);
 
-        $.get("/?module=API&method=Chat.setPopoutState&state=" + state);
+        //$.get("/?module=API&method=Chat.setPopoutState&state=" + state);
 
         $('.chat-state-1').hide();
         $('.chat-state-4').show();
@@ -318,7 +333,18 @@ var Piwik_Chat_Popout = (function ($) {
     }
 
     function getState() {
-        return state;
+        console.log("getState = " + localStorage.getItem('PopoutState'));
+        return localStorage.getItem('PopoutState');
+    }
+
+    function setState(state){
+        console.log("setState = " + state)
+        localStorage.setItem('PopoutState', state);
+        socket.postMessage(state);
+    }
+
+    function setSocket(easyXDMsocket){
+        socket = easyXDMsocket;
     }
 
     return {
@@ -326,44 +352,16 @@ var Piwik_Chat_Popout = (function ($) {
             return getState();
         },
 
-        scrollDown: function () {
-            return scrollDown();
-        },
-
-        isStaffAFK: function () {
-            return isStaffAFK;
-        },
-
-        initialize: function (state) {
-            return initialize(state);
-        },
-
-        poll: function () {
-            return poll();
+        initialize: function () {
+            return initialize();
         },
 
         setTranslationTable: function (translations) {
             return setTranslationTable(translations);
-        }
-    }
-})($);
+        },
 
-socket = new easyXDM.Socket({
-    remote: siteMainUrl,
-    onReady: function () {
-        var timer;
-        if (!timer) {
-            var currentState;
-            timer = setInterval(function () {
-                try {
-                    if (Piwik_Chat_Popout.getState() != currentState) {
-                        currentState = Piwik_Chat_Popout.getState();
-                        socket.postMessage(currentState);
-                    }
-                } catch (e) {
-                    // We tried to read the property at some point when it wasn't available
-                }
-            }, 100);
+        setSocket: function (easyXDMsocket){
+            return setSocket(easyXDMsocket);
         }
     }
-});
+}
