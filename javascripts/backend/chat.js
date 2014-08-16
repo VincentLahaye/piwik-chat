@@ -25,16 +25,19 @@ $.fn.serializeObject = function(){
 
 $(document).ready(function () {
     Piwik_Chat_Admin.poll(true);
-
-    $(window).focus(function(){
-        Piwik_Chat_Admin.stopTitleNotification();
-    })
+    Piwik_Chat_Admin.bind();
 });
 
 Piwik_Chat_Admin = (function ($, require) {
     var piwik = require('piwik'),
         winTitle = window.document.title,
         shouldStopTitleNotification = false;
+
+    function bind(){
+        $(window).focus(function(){
+            stopTitleNotification();
+        });
+    }
 
     function scrollDown() {
         var objDiv = document.getElementById("chat-conversation"),
@@ -138,7 +141,10 @@ Piwik_Chat_Admin = (function ($, require) {
                                  * If we are on the Chat module index
                                  */
                                 if (broadcast.getHash().match(/module=Chat&action=index/g).length != null) {
-                                    var getOldRow = $('.list-conversations').find("[data-visitor-id='" + visitorId + "']");
+
+                                    broadcast.propagateAjax(broadcast.getHash());
+
+                                    /*var getOldRow = $('.list-conversations').find("[data-visitor-id='" + visitorId + "']");
 
                                     if (getOldRow.length > 0) {
                                         var clone = getOldRow.clone();
@@ -166,7 +172,7 @@ Piwik_Chat_Admin = (function ($, require) {
                                         domParent.children('.date').html(msg[0].date + " " + msg[0].time);
                                     });
                                     ajax.setFormat('json');
-                                    ajax.send();
+                                    ajax.send();*/
                                 }
 
                                 /**
@@ -269,6 +275,10 @@ Piwik_Chat_Admin = (function ($, require) {
 
         stopTitleNotification: function() {
             return stopTitleNotification();
+        },
+
+        bind: function() {
+            return bind();
         }
     }
 })(jQuery, require);
@@ -479,7 +489,15 @@ Piwik_Chat_Admin = (function ($, require) {
     });
 
     broadcast.addPopoverHandler('chatHelp', function (test) {
-        Piwik_Popover.createPopupAndLoadUrl('module=Chat&action=help', _pk_translate('Live_VisitorProfile'), 'visitor-profile-popup');
+        Piwik_Popover.createPopupAndLoadUrl('module=Chat&action=help', 'Chat Help', 'chat-help-popup');
+    });
+
+    broadcast.addPopoverHandler('addAutomaticMessage', function (test) {
+        Piwik_Popover.createPopupAndLoadUrl('module=Chat&action=addOrUpdateAutomaticMessage', 'Add automatic message', 'add-auto-message-popup');
+    });
+
+    broadcast.addPopoverHandler('updateAutomaticMessage', function (id) {
+        Piwik_Popover.createPopupAndLoadUrl('module=Chat&action=addOrUpdateAutomaticMessage&idAutoMsg=' + id, 'Update automatic message', 'update-auto-message-popup');
     });
 
 })(jQuery, require);

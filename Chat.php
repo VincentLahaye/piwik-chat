@@ -62,10 +62,18 @@ class Chat extends \Piwik\Plugin
 
         \Piwik\Menu\MenuMain::getInstance()->add(
             $category = 'Chat',
+            $title = 'Automatic messages',
+            $urlParams = array('module' => $this->getPluginName(), 'action' => 'automaticMessages'),
+            $showOnlyIf = Piwik::hasUserSuperUserAccess(),
+            $order = 13
+        );
+
+        \Piwik\Menu\MenuMain::getInstance()->add(
+            $category = 'Chat',
             $title = 'Report a bug',
             $urlParams = array('module' => $this->getPluginName(), 'action' => 'reportBug'),
             $showOnlyIf = Piwik::hasUserSuperUserAccess(),
-            $order = 13
+            $order = 14
         );
 
         /*\Piwik\Menu\MenuMain::getInstance()->add(
@@ -74,14 +82,6 @@ class Chat extends \Piwik\Plugin
             $urlParams = array('module' => $this->getPluginName(), 'action' => 'index'),
             $showOnlyIf = Piwik::hasUserSuperUserAccess(),
             $order = 13
-        );*/
-
-        /*\Piwik\Menu\MenuMain::getInstance()->add(
-            $category = 'Chat',
-            $title = 'Automatic messages',
-            $urlParams = array('module' => $this->getPluginName(), 'action' => 'automaticMessages'),
-            $showOnlyIf = Piwik::hasUserSuperUserAccess(),
-            $order = 14
         );*/
     }
 

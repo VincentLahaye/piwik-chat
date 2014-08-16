@@ -1,0 +1,96 @@
+<span class="bigTitle">{% if mode == 'add' %}Create{% else %}Update{% endif %} an Automatic Message</span>
+<form action="" method="post" class="add-or-update-automsg chat-module-form">
+    <input type="hidden" name="idSite" value="{{ idSite }}" />
+    {% if mode == 'update' %}
+    <input type="hidden" name="idAutoMsg" value="{{ autoMsg.id }}" />
+    {% endif %}
+    <table class="adminTable">
+        <tbody>
+        <tr>
+            <td style="vertical-align: middle; width: 100px"><label for="name">Name </label></td>
+            <td>
+                <input name="name" style="width:50%" value="{% if mode == 'update' %}{{ autoMsg.name|raw }}{% endif %}" size="25">
+                <span class="form-description" style="margin-left: 8px;">An identifier for your automatic message</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="vertical-align: middle;"><label for="alias">Segment </label></td>
+            <td>
+                <select name="segment" style="width:50%">
+                    {% for segment in segments %}
+                    <option value="{{ segment.idsegment }}"{% if mode == 'update' %}{% if segment.idsegment == autoMsg.segment %} selected="selected"{% endif %}{% endif %}>{{ segment.name }}</option>
+                    {% endfor %}
+                </select>
+                <span class="form-description">The segment on which it will apply</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="vertical-align: middle; width: 100px"><label for="transmitter">Transmitter </label></td>
+            <td>
+                <input name="transmitter" style="width:50%" value="{% if mode == 'update' %}{{ autoMsg.transmitter|raw }}{% endif %}" size="25">
+                <span class="form-description" style="margin-left: 7px">ex: Automatic Message, Vincent, Discount codes..</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="vertical-align: middle;"><label>Frequency</label></td>
+            <td>
+                <fieldset>
+                    <input type="radio" name="frequency" id="FreqOnlyOnce" value="once"{% if mode == 'update' %}{% if autoMsg.frequency == '0' %} checked="checked"{% endif %}{% endif %} /><label for="FreqOnlyOnce">Send it only once per visitor</label><br />
+                    <input type="radio" name="frequency" id="WaitFor" value="waitfor"{% if mode == 'update' %}{% if autoMsg.frequency != '0' %} checked="checked"{% endif %}{% endif %} /><label for="WaitFor">Between two messages, wait for :</label>
+                    <input type="text" name="frequency-time" value="{% if mode == 'update' %}{% if autoMsg.frequency != '0' %}{{ freqTime|raw }}{% endif %}{% endif %}" style="width: 100px" onclick="$('input:radio[name=frequency]').filter('[value=\'waitfor\']').attr('checked', true);" />
+                    <select name="frequency-scale" onclick="$('input:radio[name=frequency]').filter('[value=\'waitfor\']').attr('checked', true);">
+                        <option value="d"{% if mode == 'update' %}{% if autoMsg.frequency != '0' %}{% if freqScale == "d" %} selected="selected"{% endif %}{% endif %}{% endif %}>Day(s)</option>
+                        <option value="w"{% if mode == 'update' %}{% if autoMsg.frequency != '0' %}{% if freqScale == "w" %} selected="selected"{% endif %}{% endif %}{% endif %}>Week(s)</option>
+                        <option value="m"{% if mode == 'update' %}{% if autoMsg.frequency != '0' %}{% if freqScale == "m" %} selected="selected"{% endif %}{% endif %}{% endif %}>Month(s)</option>
+                    </select><br />
+                </fieldset>
+            </td>
+        </tr>
+
+        <tr>
+            <td><label for="message">Message </label></td>
+            <td>
+                <textarea name="message" style="width:80%; height: 150px">{% if mode == 'update' %}{{ autoMsg.message|raw }}{% endif %}</textarea>
+                <br />
+                <span class="form-description">You can do some content spinning : "<strong style="font-style: normal">{Hi|Hello} visitor !</strong>" will randomly display "Hi visitor !" or "Hello visitor !"</span>
+                <br /><br />
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="submit" /><span class="whats-happening"></span></td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<script>
+    $('.add-or-update-automsg').submit(function(e){
+        e.preventDefault;
+
+        $('.whats-happening').html('Please wait..');
+
+        var ajaxHelper = require('ajaxHelper'),
+            ajax = new ajaxHelper();
+
+        ajax.setUrl("index.php");
+        ajax.addParams($(this).serializeObject(), 'POST');
+        ajax.addParams({module: 'Chat', action: 'addOrUpdateAutomaticMessage'}, 'GET');
+        ajax.setCallback(function () {
+            $('#message').val('');
+            $('.whats-happening').html('Success !');
+
+            var Piwik_Popover = require('Piwik_Popover');
+            Piwik_Popover.close();
+
+            broadcast.propagateAjax(broadcast.getHash());
+        });
+
+        ajax.setFormat('json');
+        ajax.send();
+
+        return false;
+    })
+</script>

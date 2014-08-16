@@ -146,3 +146,18 @@
 .whatsHappening{
     margin-left: 20px;
 }
+
+.bigTitle{
+    color: #d4291f;
+    display: block;
+    font-size: 17px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.chat-module-form input[type='radio']{
+    padding: 0px;
+    line-height: 10px;
+    min-height: 10px;
+    margin: 10px 10px 0px 0px;
+}

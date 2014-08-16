@@ -1,15 +1,24 @@
+<span style="position: absolute; right: 15px; top: 20px; font-weight: bold;">
+<a href="#" id="link-open-add-auto-msg">+ Add an automatic message</a>
+</span>
 <div class="dataTableWrapper">
     <table width="100%" cellspacing="0" style="width:100%;table-layout:fixed;" class="dataTable list-conversations">
         <thead>
         <tr>
-            <th style="width:100px" class="sortable label" id="label">
+            <th style="width:50px" class="sortable label" id="label">
                 <div id="thDIV">ID</div>
             </th>
-            <th class="sortable label" id="label">
+            <th style="width:130px" class="sortable label" id="label">
                 <div id="thDIV">Name</div>
             </th>
-            <th class="sortable label" id="label">
+            <th style="width:130px" class="sortable label" id="label">
                 <div id="thDIV">Segment</div>
+            </th>
+            <th style="width:130px" class="sortable label" id="label">
+                <div id="thDIV">Transmitter</div>
+            </th>
+            <th style="width:100px" class="sortable label" id="label">
+                <div id="thDIV">Frequency</div>
             </th>
             <th class="sortable label" id="label">
                 <div id="thDIV">Message</div>
@@ -24,15 +33,58 @@
 
             <tr data-message-id="{{ message.id }}">
                 <td class="label column id">{{ message.id|raw }}</td>
-                <td class="label column name">{{ message.name|raw }}</td>
-                <td class="label column segment">{{ message.segment|raw }}</td>
-                <td class="label column content">{{ message.message|raw }}</td>
-                <td class="label column content"></td>
+                <td class="label column name" style="overflow: hidden;">{{ message.name|raw }}</td>
+                <td class="label column segment" style="overflow: hidden;">{{ message.segmentName|raw }}</td>
+                <td class="label column transmitter" style="overflow: hidden;">{{ message.transmitter|raw }}</td>
+                <td class="label column frequency">{% if message.frequency == '0' %}Only once{% else %}{{ message.frequency|raw|replace({'|d': ' Day(s)', '|w': ' Week(s)', '|m': ' Month(s)'}) }}{% endif %}</td>
+                <td class="label column content" style="overflow: hidden;">{{ message.message|raw }}</td>
+                <td class="label column action">
+                    <a href="#" class="update-automsg">Update</a> -
+                    <a href="#" class="delete-automsg">Delete</a>
+                </td>
             </tr>
 
         {% endfor %}
-
-
         </tbody>
     </table>
 </div>
+<script>
+    $(document).ready(function () {
+        $('#link-open-add-auto-msg').on('click', function (e) {
+            e.preventDefault();
+            broadcast.propagateNewPopoverParameter('addAutomaticMessage', 1);
+            return false;
+        });
+
+        $('.delete-automsg').on('click', function (e) {
+            e.preventDefault();
+
+            if(confirm("This operation is not reversible. Are you really sure you want to perform it ?")){
+                var domLine = $(this).parent().parent(),
+                    idAutoMsg = domLine.attr('data-message-id'),
+                    ajaxHelper = require('ajaxHelper'),
+                    ajax = new ajaxHelper();
+
+                ajax.setUrl("index.php");
+                ajax.addParams({module: 'Chat', action: 'deleteAutomaticMessage'}, 'GET');
+                ajax.addParams({idAutoMsg: idAutoMsg}, 'POST');
+                ajax.setCallback(function () {
+                    domLine.remove();
+                });
+                ajax.setFormat('json');
+                ajax.send();
+            }
+
+            return false;
+        });
+
+        $('.update-automsg').on('click', function (e) {
+            e.preventDefault();
+
+            var idAutoMsg = $(this).parent().parent().attr('data-message-id');
+            broadcast.propagateNewPopoverParameter('updateAutomaticMessage', idAutoMsg);
+
+            return false;
+        });
+    });
+</script>

@@ -30,11 +30,11 @@ class Conversation
         $this->idvisitor = $idvisitor;
     }
 
-    public function sendMessage($content, $fromAdmin = false)
+    public function sendMessage($content, $fromAdmin = false, $idAutoMsg = false)
     {
         $hexVisitorId = Common::convertVisitorIdToBin($this->idvisitor);
         $sanitizeContent = Common::sanitizeInputValues($content);
-        $answerfrom = "";
+        $additionnalParams = "";
         $microtime = microtime(true);
 
         $arguments = array(
@@ -44,12 +44,17 @@ class Conversation
             $microtime
         );
 
+        if ($idAutoMsg) {
+            $additionnalParams .= ", idautomsg = ?";
+            $arguments[] = $idAutoMsg;
+        }
+
         if ($fromAdmin) {
-            $answerfrom = ", answerfrom = ?";
+            $additionnalParams .= ", answerfrom = ?";
             $arguments[] = $fromAdmin;
         }
 
-        $queryResult = Db::query("INSERT INTO " . Common::prefixTable('chat') . " SET idsite = ?, idvisitor = ?, content = ?, microtime = ?$answerfrom", $arguments);
+        $queryResult = Db::query("INSERT INTO " . Common::prefixTable('chat') . " SET idsite = ?, idvisitor = ?, content = ?, microtime = ?$additionnalParams", $arguments);
 
         if (!$fromAdmin) {
             $this->setIsNew($microtime);
@@ -116,6 +121,20 @@ class Conversation
         $row = $this->formatRow($row);
 
         return $row;
+    }
+
+    public function getAutomaticMessageReceivedById($idAutoMsg)
+    {
+        $arguments = array(
+            $this->idsite,
+            @Common::hex2bin($this->idvisitor),
+            $idAutoMsg
+        );
+
+        $rows = Db::fetchAll("SELECT * FROM " . Common::prefixTable('chat') . " WHERE idsite = ? AND idvisitor = ? AND idautomsg = ? ORDER BY microtime DESC", $arguments);
+        $rows = $this->formatRows($rows);
+
+        return $rows;
     }
 
     public function getListConversations()
@@ -338,18 +357,6 @@ class Conversation
         }
 
         return $row;
-    }
-
-    /**************************************************************************
-     * Automatic Messages
-     **************************************************************************/
-    public function getAllAutomaticMessage()
-    {
-        $rows = Db::fetchAll("SELECT id, name, message,
-		(SELECT name FROM " . Common::prefixTable('segment') . " WHERE idsegment = cae.segment) AS segment
-		FROM " . Common::prefixTable('chat_automatic_message') . " AS cae WHERE idsite = ?", array($this->idsite));
-
-        return $rows;
     }
 
     /**************************************************************************

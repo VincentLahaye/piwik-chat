@@ -16,6 +16,7 @@ use Piwik\Db;
 use Piwik\Mail;
 use Piwik\Piwik;
 use Piwik\Plugins\Goals\API as APIGoals;
+use Piwik\Segment;
 use Piwik\Tracker;
 use Piwik\Tracker\Visitor;
 use Piwik\Url;
@@ -137,27 +138,62 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
 
         $visitorInfo = $visitor->getVisitorInfo();
 
-        /***
-         * Segment recognition
-         */
-        /*$segment = new Segment("visitorConfigId==" . bin2hex($config['config_id']), 1);
-        $query = $segment->getSelectQuery("idvisitor", "log_visit");
-
-        $rows = Db::fetchAll($query['sql'], $query['bind']);
-
-        print_r($query);
-        print_r($rows);*/
-
         $idSite = Common::getRequestVar('idsite', null, 'int');
 
         $conversation = new Conversation($idSite, bin2hex($visitorInfo['idvisitor']));
+
+        /***
+         * Segment recognition
+         */
+        foreach(ChatSegment::getAll($idSite) as $segment){
+            $fetchSegment = new Segment($segment['definition'], array($idSite));
+            $query = $fetchSegment->getSelectQuery("idvisitor", "log_visit", "log_visit.idvisitor = ?", array($visitorInfo['idvisitor']));
+
+            $rows = Db::fetchAll($query['sql'], $query['bind']);
+
+            if(count($rows) == 0)
+                continue;
+
+            foreach(ChatAutomaticMessage::getAll($idSite) as $autoMsg){
+                if($autoMsg['segmentID'] != $segment['idsegment'])
+                    continue;
+
+                $getAlreadyReceivedMsg = $conversation->getAutomaticMessageReceivedById($autoMsg['id']);
+
+                // If the AutoMsg is a "one shot"
+                if($autoMsg['frequency'] == 0 && count($getAlreadyReceivedMsg) > 0)
+                    continue;
+
+                if($autoMsg['frequency'] != 0){
+                    // Now, we gonna try to define when the last AutoMsg received has been sent
+                    list($freqTime, $freqScale) = explode('|', $autoMsg['frequency']);
+
+                    if($freqScale == "w")
+                        $dayMultiplier = 7;
+                    elseif($freqScale == "m")
+                        $dayMultiplier = 30;
+                    else
+                        $dayMultiplier = 1;
+
+                    $secToWait = 3600 * 24 * $freqTime * $dayMultiplier;
+
+                    // Is it older than the time range needed to wait ?
+                    if(($getAlreadyReceivedMsg[0]['microtime'] + $secToWait) > microtime(true))
+                        continue;
+                }
+
+                $conversation->sendMessage($autoMsg['message'], 'Vincent', $autoMsg['id']);
+            }
+
+        }
+
         $messages = $conversation->getAllMessages();
 
         if (count($messages) == 0) {
             $_SESSION['popoutState'] = 2;
-        } elseif (!isset($_SESSION['popoutState']) || $_SESSION['popoutState'] != 1) {
+        } /*elseif (!isset($_SESSION['popoutState'])) {
             $_SESSION['popoutState'] = 4;
-        }
+        }*/
 
         $view = new View('@Chat/popout.twig');
         $view->messages = $messages;
@@ -172,6 +208,8 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
 
     public function help()
     {
+        Piwik::checkUserHasSomeAdminAccess();
+
         $view = new View('@Chat/help.twig');
         return $view->render();
     }
@@ -186,6 +224,8 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
 
     public function reportBug()
     {
+        Piwik::checkUserHasSomeAdminAccess();
+
         $idSite = Common::getRequestVar('idSite', null, 'int');
 
         $jsonConfig = json_decode(file_get_contents(getcwd() . '/plugins/Chat/plugin.json'), true);
@@ -203,6 +243,8 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
 
     public function sendBug()
     {
+        Piwik::checkUserHasSomeAdminAccess();
+
         $idSite = Common::getRequestVar('idSite', null, 'int');
         $email = Common::getRequestVar('email', null);
         $name = Common::getRequestVar('name', null);
@@ -232,25 +274,88 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         }
     }
 
-    /*public function automaticmessages()
+    public function automaticMessages()
     {
-        $idsite = common::getrequestvar('idsite', null, 'int');
+        Piwik::checkUserHasSomeAdminAccess();
 
-        $conversation = new conversation($idsite);
-        $messages = $conversation->getallautomaticmessage();
+        $idSite = Common::getRequestVar('idSite', null, 'int');
 
-        $view = new view('@chat/listautomaticmessages.twig');
-        $view->messages = $messages;
+        $view = new view('@Chat/listAutomaticMessages.twig');
+        $view->messages = ChatAutomaticMessage::getAll($idSite);
 
         return $view->render();
     }
 
-    public function addautomaticmessages()
+    public function addOrUpdateAutomaticMessage()
     {
-        $view = new view('@chat/addorupdateautomaticmessages.twig');
+        Piwik::checkUserHasSomeAdminAccess();
+
+        // Get request variables
+        $idSite = Common::getRequestVar('idSite', null, 'int');
+        $idAutoMsg = Common::getRequestVar('idAutoMsg', '', 'int');
+        $name   = Common::getRequestVar('name', '');
+        $segment = Common::getRequestVar('segment', '');
+        $transmitter = Common::getRequestVar('transmitter', '');
+        $message = Common::getRequestVar('message', '');
+        $freq    = Common::getRequestVar('frequency', '');
+        $freqTime = Common::getRequestVar('frequency-time', '1', 'int');
+        $freqScale = Common::getRequestVar('frequency-scale', 'd');
+
+        // Do some job (insert or update) in case of we have enough information
+        if($idSite != '' && $name != '' && $segment != '' && $message != '' && $freq != '' && $transmitter != ''){
+
+            $frequency = "0";
+            if($freq != "once"){
+                if($freqScale != "d" && $freqScale != "w" && $freqScale != "m")
+                    $freqScale = "d";
+
+                $frequency = $freqTime . "|" . $freqScale;
+            }
+
+            if($idAutoMsg){
+                ChatAutomaticMessage::update($idAutoMsg, $idSite, $name, $segment, $message, $frequency, $transmitter);
+            } else {
+                ChatAutomaticMessage::add($idSite, $name, $segment, $message, $frequency, $transmitter);
+            }
+
+            return true;
+        }
+
+        // Display
+        $view = new view('@Chat/addOrUpdateAutomaticMessage.twig');
+
+        if($idAutoMsg){
+            $autoMsg = ChatAutomaticMessage::get($idAutoMsg);
+
+            $view->autoMsg = $autoMsg;
+            $view->mode = 'update';
+
+            if($autoMsg['frequency'] != "" && $autoMsg['frequency'] != "0")
+                list($view->freqTime, $view->freqScale) = explode('|', $autoMsg['frequency']);
+
+        } else {
+            $view->mode = 'add';
+        }
+
+        $view->segments = ChatSegment::getAll($idSite);
+        $view->idSite = $idSite;
 
         return $view->render();
-    }*/
+    }
+
+    public function deleteAutomaticMessage()
+    {
+        Piwik::checkUserHasSomeAdminAccess();
+
+        $idAutoMsg = Common::getRequestVar('idAutoMsg', null, 'int');
+
+        if($idAutoMsg != null){
+            ChatAutomaticMessage::delete($idAutoMsg);
+            return true;
+        }
+
+        return false;
+    }
 
     private function getVisitorProfileExportLink()
     {
