@@ -135,7 +135,7 @@
 						</span>
 						<span class='microtime'>
 							<span class='date'{% if message.date == lastDate %} style="display:none"{% endif %}>{{ message.date|raw }}</span>
-							<span class='time'{% if message.time == lastTime %} style="display:none"{% endif %}>{{ message.time|raw }}</span>
+							<span class='time'{% if message.time == lastTime %} style="display:none; margin-left: 10px"{% endif %}>{{ message.time|raw }}</span>
 						</span>
                     </p>
                     {% set displayAuthor = false %}
