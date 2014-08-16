@@ -133,7 +133,7 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
          */
         $settings = new Tracker\Settings($request, $visitorInfo['location_ip']);
 
-        $visitor = new Visitor($request, $settings, $visitorInfo);
+        $visitor = new Visitor($request, $settings->getConfigId(), $visitorInfo);
         $visitor->recognize();
 
         $visitorInfo = $visitor->getVisitorInfo();
@@ -182,18 +182,12 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
                         continue;
                 }
 
-                $conversation->sendMessage($autoMsg['message'], 'Vincent', $autoMsg['id']);
+                $conversation->sendMessage($autoMsg['message'], $autoMsg['transmitter'], $autoMsg['id']);
             }
 
         }
 
         $messages = $conversation->getAllMessages();
-
-        if (count($messages) == 0) {
-            $_SESSION['popoutState'] = 2;
-        } /*elseif (!isset($_SESSION['popoutState'])) {
-            $_SESSION['popoutState'] = 4;
-        }*/
 
         $view = new View('@Chat/popout.twig');
         $view->messages = $messages;
