@@ -63,11 +63,11 @@ function Piwik_Chat_Popout () {
         }
 
         $('.chat-state-' + getState()).show();
+        scrollDown();
 
         socket.postMessage(getState());
 
         bindEventCallbacks();
-        scrollDown();
         isStaffAFK();
         poll();
     }
@@ -285,6 +285,8 @@ function Piwik_Chat_Popout () {
 
         $('.chat-state-1').hide();
         $('.chat-state-4').show();
+
+        scrollDown();
     }
 
     function updatePersonnalInformations(name, email) {
