@@ -29,8 +29,6 @@
         "EndInstall": "Ende der Installation",
         "EndInstallWhatToDo": "Stellen Sie sicher, dass Sie diesen Code auf allen ihren Seiten nach ihren Piwik Trackingcode platzieren.",
         "HowToUse": "Howto / Einsatz",
-        "HowToUseDesc": "Die Besucherprofile wurden automatisch vom Piwik Chat Plugin bearbeitet um es ihnen über den neuen Chat Tab zu ermöglichen Ihre Besucher / Kunden direkt anzuschreiben.",
-        "": "",
-        "": ""
+        "HowToUseDesc": "Die Besucherprofile wurden automatisch vom Piwik Chat Plugin bearbeitet um es ihnen über den neuen Chat Tab zu ermöglichen Ihre Besucher / Kunden direkt anzuschreiben."
     }
 }
