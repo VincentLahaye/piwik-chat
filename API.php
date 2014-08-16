@@ -94,14 +94,6 @@ class API extends \Piwik\Plugin\API
         return true;
     }
 
-    public function setPopoutState($state)
-    {
-        if ($state == 1 || $state == 4)
-            $_SESSION['popoutState'] = $state;
-
-        return true;
-    }
-
     public function isStaffOnline($idSite)
     {
         $conversation = new Conversation($idSite);
