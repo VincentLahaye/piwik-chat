@@ -58,7 +58,6 @@
         ajax.addParams({module: 'Chat', action: 'sendBug'}, 'GET');
         ajax.addParams($(this).serializeObject(), 'POST');
         ajax.setCallback(function () {
-            $('#successNotice').show();
             $('#message').val('');
             $('.whatsHappening').html('Bug report successfully sent to the developer ! Thank you ;)');
         });
