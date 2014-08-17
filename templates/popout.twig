@@ -7,8 +7,6 @@
 </head>
 
 <body>
-<input type="hidden" id="idvisitor" value="{{ idvisitor }}"/>
-
 <div class="chat-container chat-state-1">
     <div class="chat-wrapper">
         <div class="chat-header">
@@ -84,78 +82,7 @@
             </span>
             <span class="action-logo">-</span>
         </div>
-        <div id="chat-conversation">
-            {% set lastAuthor = "null" %}
-            {% set hasQuit = true %}
-            {% set lastDate = "null" %}
-            {% set lastTime = "null" %}
-            {% set lastNameMsgStaff = "null" %}
-            {% set lastTimeMsgStaff = "null" %}
-            {% set firstMsgStaff = false %}
-            {% set i = 0 %}
-            {% set displayAuthor = false %}
-            {% set displayLoginStatus = false %}
-
-            {% for message in messages %}
-
-                {% if hasQuit == false %}
-                    {% if lastTimeMsgStaff < (message.microtime - (2 * 60 * 60)) %}
-                        <p class="has-quit offline">{{ lastNameMsgStaff }} {{ 'Chat_HasQuit'|translate }}</p>
-                        {% set hasQuit = true %}
-                        {% set displayLoginStatus = true %}
-                    {% endif %}
-                {% endif %}
-
-                {% if message.answerfrom != "" %}
-                    {% if hasQuit == true %}
-                        <p class="has-quit">{{ message.answerfrom|raw }} {{ 'Chat_HasJoin'|translate }}</p>
-                        {% set hasQuit = false %}
-                        {% set displayLoginStatus = true %}
-                    {% endif %}
-                {% endif %}
-
-                {% if message.answerfrom != lastAuthor %}
-                    {% set displayAuthor = true %}
-                {% endif %}
-
-                {% if displayLoginStatus == true %}
-                    {% set displayAuthor = true %}
-                    {% set displayLoginStatus = false %}
-                {% endif %}
-
-                {% if displayAuthor == true %}
-                    <p class="author-container">
-						<span class="author">
-							{% if message.answerfrom == "" %}
-                                {{ 'Chat_You'|translate }}
-                            {% else %}
-                                {{ message.answerfrom|raw }}
-                                {% set firstMsgStaff = true %}
-                            {% endif %}
-						</span>
-						<span class='microtime'>
-							<span class='date'{% if message.date == lastDate %} style="display:none"{% endif %}>{{ message.date|raw }}</span>
-							<span class='time'{% if message.time == lastTime %} style="display:none; margin-left: 10px"{% endif %}>{{ message.time|raw }}</span>
-						</span>
-                    </p>
-                    {% set displayAuthor = false %}
-                {% endif %}
-
-                <p class="chat-msg" data-microtime="{{ message.microtime|raw }}" data-date="{{ message.date|raw }}"
-                   data-time="{{ message.time|raw }}" title="{{ message.date|raw }} {{ message.time|raw }}">
-                    {{ message.content|raw }}
-                </p>
-
-                {% if message.answerfrom != '' %}
-                    {% set lastNameMsgStaff = message.answerfrom %}
-                    {% set lastTimeMsgStaff = message.microtime %}
-                {% endif %}
-
-                {% set lastAuthor = message.answerfrom %}
-                {% set lastDate = message.date %}
-                {% set lastTime = message.time %}
-            {% endfor %}
-        </div>
+        <div id="chat-conversation"></div>
         <div class="chat-push"></div>
     </div>
     <div class="chat-footer">
@@ -164,15 +91,17 @@
         </div>
     </div>
 </div>
+<script src="{{ piwikUrl }}plugins/Chat/javascripts/moment.js"></script>
 <script src="{{ piwikUrl }}plugins/Chat/javascripts/client/jquery.min.js"></script>
 <script src="{{ piwikUrl }}plugins/Chat/javascripts/client/easyXDM.min.js"></script>
-<script>
-    siteMainUrl = "{{ siteUrl }}";
-</script>
 <script src="{{ piwikUrl }}plugins/Chat/javascripts/client/popout.js"></script>
 <script>
     $(document).ready(function () {
         var popout = new Piwik_Chat_Popout();
+
+        popout.setIdvisitor('{{ idvisitor }}');
+        popout.setIdsite('{{ idsite }}');
+        popout.setLanguage('{{ lang }}');
 
         popout.setTranslationTable({
             'You': '{{ 'Chat_You'|translate }}',
@@ -184,9 +113,8 @@
 
         // Create a communication socket between this page and its parent page (the one displaying the iframe)
         var socket = new easyXDM.Socket({
-            remote: siteMainUrl,
+            remote: '{{ siteUrl }}',
             onReady: function () {
-
                 popout.setSocket(socket);
                 popout.initialize();
             }

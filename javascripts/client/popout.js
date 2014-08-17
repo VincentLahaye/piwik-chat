@@ -1,61 +1,46 @@
-function Piwik_Chat_Popout () {
+function Piwik_Chat_Popout() {
 
-    var __tr,
-        state,
-        socket,
+    var __tr,   // Translation table
+        state,  // Popout state
+        socket, // easyXDM socket
         staffAlreadyAfk,
-        lastNameStaff;
-
-    function scrollDown() {
-        var objDiv = document.getElementById("chat-conversation");
-        objDiv.scrollTop = objDiv.scrollHeight;
-    }
-
-    function isStaffAFK() {
-        var query = getQueryParams(document.location.search);
-
-        if (getState() == 4) {
-            var lastTimeMsgStaff = parseInt($(".author:not(:contains('" + __tr['You'] + "'))").last().parent().next().attr('data-microtime'));
-
-            if (lastTimeMsgStaff < parseInt((Date.now() / 1000) - (2 * 60 * 60)) && !$("#chat-conversation p.has-quit").last().hasClass('offline')) {
-                $('#chat-conversation').append('<p class="has-quit offline">' + $(".author:not(:contains('" + __tr['You'] + "'))").last().html() + ' has quit this session.</p>');
-                staffAlreadyAfk = true;
-
-                scrollDown();
-            }
-        }
-
-        if (getState() != 1) {
-
-            $.ajax({
-                type: "GET",
-                url: "/index.php",
-                dataType: "json",
-                cache: false,
-                data: {module: 'API', method: 'Chat.isStaffOnline', idSite: query.idsite, format: 'json'},
-                success: function (result) {
-                    if (result.value === true) {
-                        $('.is-staff-online').html('<div class="yes"><span class="circle"></span> ' + __tr['StaffOnline'] + '</div>');
-                        $('.chat-header .circle').show();
-                        $('.chat-state-3 .notice').hide();
-                    } else {
-                        $('.is-staff-online').html('');
-                        $('.chat-header .circle').hide();
-                        $('.chat-state-3 .notice').show();
-                    }
-                }
-            });
-        }
-
-        setTimeout(function(){ return isStaffAFK(); }, 20000); // 20 seconds
-    }
+        lastNameStaff,
+        lastStaffMessage,
+        localLanguage,
+        idvisitor = null,
+        idsite = null,
+        domConversation = $('#chat-conversation');
 
     function initialize() {
 
-        if($.inArray(getState(), ['1','2','3','4']) === -1){
-            console.log("WTF is this popout state ?!");
+        domConversation.html('<p style="margin:20px; text-align:center;">Loading messages...</p>');
 
-            if($('#chat-conversation').children().length == 0){
+        var messages = getMessages(),
+            microtimeFrom = false;
+
+        if (messages != null) {
+            microtimeFrom = getLastReceivedMessageMicrotime(); // Get last message microtime in order to get new message from this microtime
+        }
+
+        $.ajax({
+            type: "GET",
+            url: "/index.php",
+            dataType: "json",
+            cache: false,
+            data: {module: 'API', method: 'Chat.getMessages', idSite: idsite, visitorId: idvisitor, format: 'json', microtimeFrom: microtimeFrom},
+            success: function (newMessages) {
+                if (messages != null) {
+                    appendToMessages(newMessages);
+                } else {
+                    setMessages(newMessages);
+                }
+
+                populateConversation(getMessages(), {}, true);
+            }
+        });
+
+        if ($.inArray(getState(), ['1', '2', '3', '4']) === -1) {
+            if (domConversation.children().length == 0) {
                 setState(2); // Need some help ?
             } else {
                 setState(4); // Display conversation
@@ -72,134 +57,161 @@ function Piwik_Chat_Popout () {
         poll();
     }
 
-    function getQueryParams(qs) {
-        qs = qs.split("+").join(" ");
+    function populateConversation(messages, lastMessage, reInit){
+        if(reInit == true)
+            domConversation.html('');
 
-        var params = {}, tokens,
-            re = /[?&]?([^=]+)=([^&]*)/g;
+        if(typeof lastMessage === 'undefined')
+            lastMessage = {};
 
-        while (tokens = re.exec(qs)) {
-            params[decodeURIComponent(tokens[1])]
-                = decodeURIComponent(tokens[2]);
-        }
-
-        return params;
-    }
-
-    function appendMessage(user, message, microtime, date, time) {
-        var lastAuthor = $('#chat-conversation .author').last().html();
-        var html = "";
-        var displayAuthor = false;
-
-        if (user != __tr['You'] && (staffAlreadyAfk == true || $(".author:not(:contains('" + __tr['You'] + "'))").length == 0)) {
-            $('#chat-conversation').append('<p class="has-quit">' + user + ' ' + __tr['HasJoin'] + '</p>');
-            staffAlreadyAfk = false;
-        }
-
-        if (user != lastAuthor || $("#chat-conversation p").last().hasClass('has-quit') == true) {
-            displayAuthor = true;
-        }
-
-        if (displayAuthor == true) {
-            html += '<p class="author-container">';
-            html += '<span class="author">' + user + '</span>';
-            html += '<span class="microtime">';
-
-            var lastDate = $("#chat-conversation p:not('.has-quit')").last().attr('data-date');
-            var lastTime = $("#chat-conversation p:not('.has-quit')").last().attr('data-time');
-
-            if (lastDate == date)
-                var displayNone = ' style="display:none"';
-
-            html += '<span class="date"' + displayNone + '>' + date + '</span>';
-
-            if (lastTime == time)
-                var displayNone = ' style="display:none"';
-
-            html += '<span class="time"' + displayNone + '>' + time + '</span>';
-
-
-            html += '</span>';
-            html += '</p>';
-        }
-
-        html += '<p class="chat-msg" data-microtime="' + microtime + '" data-date="' + date + '" data-time="' + time + '">' + message + '</p>';
-
-        $('#chat-conversation').append(html);
-
-        if (user != __tr['You']) {
-            lastNameStaff = user;
-        }
+        $.each(messages, function (key, message) {
+            appendMessage(message, lastMessage);
+            lastMessage = message;
+        });
 
         scrollDown();
     }
 
-    function poll(microtime) {
-        var query = getQueryParams(document.location.search),
-            shouldWePlaySound = false;
+    function isStaffAFK() {
+        if (getState() == 4) {
+            var lastTimeMsgStaff = parseInt($(".author:not(:contains('" + __tr['You'] + "'))").last().parent().next().attr('data-microtime'));
 
+            if (lastTimeMsgStaff < parseInt((Date.now() / 1000) - (2 * 60 * 60)) && !$("#chat-conversation p.has-join-or-quit").last().hasClass('offline')) {
+                domConversation.append('<p class="has-join-or-quit offline">' + $(".author:not(:contains('" + __tr['You'] + "'))").last().html() + ' has quit this session.</p>');
+                staffAlreadyAfk = true;
+
+                scrollDown();
+            }
+        }
+
+        if (getState() != 1) {
+
+            $.ajax({
+                type: "GET",
+                url: "/index.php",
+                dataType: "json",
+                cache: false,
+                data: {module: 'API', method: 'Chat.isStaffOnline', idSite: idsite, format: 'json'},
+                success: function (result) {
+                    if (result.value === true) {
+                        $('.is-staff-online').html('<div class="yes"><span class="circle"></span> ' + __tr['StaffOnline'] + '</div>');
+                        $('.chat-header .circle').show();
+                        $('.chat-state-3 .notice').hide();
+                    } else {
+                        $('.is-staff-online').html('');
+                        $('.chat-header .circle').hide();
+                        $('.chat-state-3 .notice').show();
+                    }
+                }
+            });
+        }
+
+        setTimeout(function () {
+            return isStaffAFK();
+        }, 20000); // 20 seconds
+    }
+
+    function scrollDown() {
+        var objDiv = document.getElementById("chat-conversation");
+        objDiv.scrollTop = objDiv.scrollHeight;
+    }
+
+    function appendMessage(message, lastMessage) {
+
+        var displayAuthor = false,
+            currentAuthor = (message.answerfrom !== 'undefined' && message.answerfrom !== null) ? message.answerfrom : __tr['You'],
+            lastAuthor = (lastMessage.answerfrom !== 'undefined' && lastMessage.answerfrom !== null) ? lastMessage.answerfrom : __tr['You'],
+            html = "";
+
+        if(typeof message.moment === 'undefined' && typeof message.microtime !== 'undefined'){
+            var splitCurMsgMicrotime = message.microtime.split('.');
+            message.moment = moment.unix(splitCurMsgMicrotime[0]);
+        }
+
+        if(typeof lastMessage.moment === 'undefined' && typeof lastMessage.microtime !== 'undefined'){
+            var splitOldMsgMicrotime = lastMessage.microtime.split('.');
+            lastMessage.moment = moment.unix(splitOldMsgMicrotime[0]);
+        }
+
+        if (message.idautomsg != null)
+            console.log(message);
+
+        if (staffAlreadyAfk == false && lastStaffMessage.microtime < (message.microtime - (2 * 60 * 60)) && lastMessage.idautomsg == null) {
+            domConversation.append('<p class="has-join-or-quit">' + lastStaffMessage.answerfrom + ' ' + __tr['HasQuit'] + '</p>');
+            staffAlreadyAfk = true;
+            displayAuthor = true;
+        }
+
+        if (message.answerfrom && (staffAlreadyAfk == true || lastMessage === 'undefined' || lastMessage.answerfrom === null) && message.idautomsg == null) {
+            domConversation.append('<p class="has-join-or-quit" title="' + message.moment.format('LLL') + '">' + message.answerfrom + ' ' + __tr['HasJoin'] + '</p>');
+            staffAlreadyAfk = false;
+            displayAuthor = true;
+        }
+
+        if (currentAuthor != lastAuthor || $("#chat-conversation p").last().hasClass('has-join-or-quit') == true) {
+            console.log((currentAuthor != lastAuthor || $("#chat-conversation p").last().hasClass('has-join-or-quit') == true));
+            displayAuthor = true;
+        }
+
+        if (displayAuthor == true) {
+            html += '<p class="author-container"><span class="author">' + currentAuthor + '</span><span class="microtime">' + message.moment.fromNow() + '</span></p>';
+        }
+
+        html += '<p class="chat-msg" data-microtime="' + message.microtime + '" title="' + message.moment.format('LLL') + '">' + message.content + '<span class="microtime"></span></p>';
+
+        if (message.answerfrom != null && message.idautomsg == null) {
+            lastStaffMessage = message;
+        }
+
+        domConversation.append(html);
+        scrollDown();
+    }
+
+    function poll(microtime) {
         if (getState() == 1 || getState() == 4) {
             $.ajax({
                 type: "GET",
                 url: "/index.php",
                 dataType: "json",
                 cache: false,
-                data: {module: 'API', method: 'Chat.poll', visitorId: $('#idvisitor').val(), idSite: query.idsite, format: 'json', microtime: microtime},
-                success: function (data) {
-                    console.log(data);
+                data: {module: 'API', method: 'Chat.poll', visitorId: idvisitor, idSite: idsite, format: 'json', microtime: microtime},
+                success: function (newMessages) {
+                    console.log(newMessages);
 
-                    if (getState() != 4)
-                        maximizePopout();
+                    if(newMessages.value === false){
+                        var microtime = getLastReceivedMessageMicrotime();
+                    } else {
+                        var microtime = newMessages[newMessages.length - 1]['microtime'];
 
-                    for (var i = 0, len = data.length; i < len; i++) {
-                        appendMessage(data[i].answerfrom, data[i].content, data[i].microtime, data[i].date, data[i].time);
+                        appendToMessages(newMessages);
 
-                        if (i == (len - 1))
-                            var lastMicrotime = data[i].microtime;
+                        if (getState() != 4)
+                            maximizePopout();
 
-                        shouldWePlaySound = true;
-                    }
+                        populateConversation(newMessages, getLastReceivedMessage());
 
-                    if (shouldWePlaySound) {
                         playSound('notification');
                     }
 
-                    poll(lastMicrotime);
+                    poll(microtime);
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    console.log("error: "+ textStatus + " "+ errorThrown);
-                    setTimeout(function(){ return poll(); }, 15000);
+                    console.log("error: " + textStatus + " " + errorThrown);
+                    setTimeout(function () {
+                        return poll();
+                    }, 15000);
                 }
             });
         }
     }
 
     function sendMessage(textareaDomElement) {
-        var query = getQueryParams(document.location.search);
-        var message = $(textareaDomElement).val();
-        var idVisitor = $('#idvisitor').val();
+        var textareaVal = $(textareaDomElement).val();
 
-        if (message && idVisitor) {
+        if (textareaVal != "") {
+            var newMessage = {moment: moment(), content: textareaVal, answerfrom: null, idmessage: null}
 
-            var offset = +1;
-            var dateObj = new Date(new Date().getTime() + offset * 3600 * 1000);
-            var hours = dateObj.getHours();
-            var minutes = dateObj.getMinutes();
-            var day = dateObj.getDate();
-            var month = dateObj.getMonth() + 1;
-            var year = dateObj.getFullYear();
-
-            if (hours < 10)
-                hours = "0" + hours;
-
-            var time = hours + ":" + minutes;
-
-            if (month < 10)
-                month = "0" + month;
-
-            var date = day + "/" + month + "/" + year;
-
-            appendMessage(__tr['You'], message, (Date.now() / 1000), date, time);
+            appendMessage(newMessage, getLastReceivedMessage());
 
             $(textareaDomElement).val("");
 
@@ -208,23 +220,19 @@ function Piwik_Chat_Popout () {
                 url: "/?module=API&method=Chat.sendMessage&format=json",
                 dataType: "json",
                 cache: false,
-                data: {visitorId: idVisitor, idSite: query.idsite, message: message},
-                success: function (data) {
-                    console.log(data);
+                data: {visitorId: idvisitor, idSite: idsite, message: newMessage.content},
+                success: function (message) {
+                    console.log(message);
+                    appendToMessages(message);
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     console.log("error: " + textStatus + " " + errorThrown);
-                },
-                complete: function () {
-
                 }
             });
         }
     }
 
     function submitMessageFromStep2(msg) {
-        console.log('submitMessageFromStep2');
-
         $('.chat-state-3 .chat-input').html(msg);
 
         $('.chat-state-2').hide();
@@ -271,8 +279,6 @@ function Piwik_Chat_Popout () {
         $('.chat-state-4 .action-logo').on('click', function (e) {
             setState(1);
 
-            //$.get("/?module=API&method=Chat.setPopoutState&state=" + state);
-
             $('.chat-state-4').hide();
             $('.chat-state-1').show();
         });
@@ -281,8 +287,6 @@ function Piwik_Chat_Popout () {
     function maximizePopout() {
         setState(4);
 
-        //$.get("/?module=API&method=Chat.setPopoutState&state=" + state);
-
         $('.chat-state-1').hide();
         $('.chat-state-4').show();
 
@@ -290,31 +294,24 @@ function Piwik_Chat_Popout () {
     }
 
     function updatePersonnalInformations(name, email) {
-        var query = getQueryParams(document.location.search);
-        var idVisitor = $('#idvisitor').val();
-
         $.ajax({
             type: "POST",
             url: "/?module=API&method=Chat.updatePersonnalInformations",
             dataType: "xml",
             cache: false,
-            data: {visitorId: idVisitor, idSite: query.idsite, name: name, email: email},
+            data: {visitorId: idvisitor, idSite: idsite, name: name, email: email},
             success: function (data) {
                 console.log(data);
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 console.log("error: " + textStatus + " " + errorThrown);
-            },
-            complete: function () {
-
             }
         });
     }
 
     function playSound(type) {
-
-        var soundFolder = "/plugins/Chat/sounds/";
-        var file;
+        var soundFolder = "/plugins/Chat/sounds/",
+            file;
 
         switch (type) {
             default:
@@ -335,25 +332,71 @@ function Piwik_Chat_Popout () {
     }
 
     function getState() {
-        console.log("getState = " + localStorage.getItem('PopoutState'));
         return localStorage.getItem('PopoutState');
     }
 
-    function setState(state){
-        console.log("setState = " + state)
+    function setState(state) {
         localStorage.setItem('PopoutState', state);
         socket.postMessage(state);
     }
 
-    function setSocket(easyXDMsocket){
+    function getMessages() {
+        return JSON.parse(localStorage.getItem('ChatMessages'));
+    }
+
+    function getLastReceivedMessage(){
+        var messages = getMessages();
+        return messages[messages.length - 1];
+    }
+
+    function getLastReceivedMessageMicrotime(){
+        var lastMessage = getLastReceivedMessage();
+        return lastMessage['microtime'];
+    }
+
+    function setMessages(messages) {
+        localStorage.setItem('ChatMessages', JSON.stringify(messages));
+    }
+
+    function appendToMessages(messages) {
+        if (messages.length == 0)
+            return false;
+
+        var actualMessages = getMessages();
+
+        for (var i = 0, len = messages.length; i < len; i++) {
+            actualMessages.push(messages[i]);
+        }
+
+        localStorage.setItem('ChatMessages', JSON.stringify(actualMessages));
+    }
+
+    function setSocket(easyXDMsocket) {
         socket = easyXDMsocket;
     }
 
-    return {
-        getState: function () {
-            return getState();
-        },
+    function setLanguage(lang){
+        var splittedLang = lang.split(',');
+        localLanguage = splittedLang[0];
 
+        moment.locale(localLanguage);
+    }
+
+    function setIdvisitor(value) {
+        if (idvisitor != null)
+            return false;
+
+        idvisitor = value;
+    }
+
+    function setIdsite(value) {
+        if (idsite != null)
+            return false;
+
+        idsite = value;
+    }
+
+    return {
         initialize: function () {
             return initialize();
         },
@@ -362,8 +405,20 @@ function Piwik_Chat_Popout () {
             return setTranslationTable(translations);
         },
 
-        setSocket: function (easyXDMsocket){
+        setSocket: function (easyXDMsocket) {
             return setSocket(easyXDMsocket);
+        },
+
+        setIdvisitor: function (idvisitor) {
+            return setIdvisitor(idvisitor);
+        },
+
+        setIdsite: function (idsite) {
+            return setIdsite(idsite);
+        },
+
+        setLanguage: function (lang) {
+            return setLanguage(lang);
         }
     }
 }
