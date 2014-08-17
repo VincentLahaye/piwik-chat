@@ -16,14 +16,14 @@ use Piwik\Piwik;
 use Piwik\View;
 
 /**
- * @see plugins/Chat/Conversation.php
+ * @see plugins/Chat/ChatConversation.php
  */
-require_once PIWIK_INCLUDE_PATH . '/plugins/Chat/Conversation.php';
+require_once PIWIK_INCLUDE_PATH . '/plugins/Chat/ChatConversation.php';
 
 /**
- * API for plugin Conversation
+ * API for plugin ChatConversation
  *
- * @package Conversation
+ * @package ChatConversation
  * @method static \Piwik\Plugins\Chat\API getInstance()
  */
 class API extends \Piwik\Plugin\API
@@ -37,8 +37,16 @@ class API extends \Piwik\Plugin\API
             header("Access-Control-Allow-Origin: *");
         }
 
-        $conversation = new Conversation($idSite, $visitorId);
+        $conversation = new ChatConversation($idSite, $visitorId);
         return $conversation->poll($microtime, $fromAdmin);
+    }
+
+    public function getMessages($idSite, $visitorId = false, $microtimeFrom = false)
+    {
+        header("Access-Control-Allow-Origin: *");
+
+        $conversation = new ChatConversation($idSite, $visitorId);
+        return $conversation->getAllMessages($microtimeFrom);
     }
 
     public function sendMessage($idSite, $visitorId, $message, $fromAdmin = false)
@@ -50,17 +58,17 @@ class API extends \Piwik\Plugin\API
             header("Access-Control-Allow-Origin: *");
         }
 
-        $conversation = new Conversation($idSite, $visitorId);
-        $conversation->sendMessage($message, $fromAdmin);
+        $conversation = new ChatConversation($idSite, $visitorId);
+        $newMessages = $conversation->sendMessage($message, $fromAdmin);
 
-        return true;
+        return $newMessages;
     }
 
     public function setLastViewed($idSite, $visitorId, $messageId)
     {
         $this->authenticate($idSite);
 
-        $conversation = new Conversation($idSite, $visitorId);
+        $conversation = new ChatConversation($idSite, $visitorId);
         $conversation->setLastViewed($messageId, Piwik::getCurrentUserLogin());
 
         return true;
@@ -70,15 +78,14 @@ class API extends \Piwik\Plugin\API
     {
         $this->authenticate($idSite);
 
-        $conversation = new Conversation($idSite);
-        return $conversation->getUnreadConversations(Piwik::getCurrentUserLogin());
+        return ChatAcknowledgment::getUnreadConversations(Piwik::getCurrentUserLogin());
     }
 
     public function getVisitorLastMessage($idSite, $visitorId)
     {
         $this->authenticate($idSite);
 
-        $conversation = new Conversation($idSite, $visitorId);
+        $conversation = new ChatConversation($idSite, $visitorId);
         return $conversation->getVisitorLastMessage();
     }
 
@@ -88,16 +95,12 @@ class API extends \Piwik\Plugin\API
             $this->authenticate($idSite);
         }
 
-        $conversation = new Conversation($idSite, $visitorId);
-        $conversation->updatePersonnalInformations($name, $email, $phone, $comments);
-
-        return true;
+        return ChatPersonnalInformation::update($visitorId, $name, $email, $phone, $comments);
     }
 
     public function isStaffOnline($idSite)
     {
-        $conversation = new Conversation($idSite);
-        return $conversation->isStaffOnline();
+        return ChatPiwikUser::isStaffOnline();
     }
 
 

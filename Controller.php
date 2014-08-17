@@ -41,9 +41,10 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
 
         $idSite = Common::getRequestVar('idSite', null, 'int');
 
-        $conversation = new Conversation($idSite);
+        $conversation = new ChatConversation($idSite);
         $messages = $conversation->getListConversations();
-        $unread = $conversation->getUnreadConversations(Piwik::getCurrentUserLogin());
+
+        $unread = ChatAcknowledgment::getUnreadConversations(Piwik::getCurrentUserLogin());
 
         $view = new View('@Chat/listConversations.twig');
         $view->messages = $messages;
@@ -70,13 +71,13 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
             $gotoChat = (isset($_SESSION['chatViewByDefault'])) ? $_SESSION['chatViewByDefault'] : false;
         }
 
-        $conversation = new Conversation($idSite, $idvisitor);
+        $conversation = new ChatConversation($idSite, $idvisitor);
         $messages = $conversation->getAllMessages();
-        $infos = $conversation->getPersonnalInformations();
+        $infos = ChatPersonnalInformation::get($idvisitor);
 
         if (count($messages) > 0) {
             $lastMsgIndex = count($messages) - 1;
-            $conversation->setLastViewed($messages[$lastMsgIndex]['microtime'], Piwik::getCurrentUserLogin());
+            ChatAcknowledgment::setLastViewed($idvisitor, $messages[$lastMsgIndex]['microtime'], Piwik::getCurrentUserLogin());
         }
 
         $view = new View('@Chat/getVisitorProfilePopup.twig');
@@ -89,10 +90,10 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         $view->infos = $infos;
 
         if (Common::getRequestVar('showMap', 1) == 1
-            && isset($view->visitorData['hasLatLong'])
+            && !empty($view->visitorData['hasLatLong'])
             && \Piwik\Plugin\Manager::getInstance()->isPluginLoaded('UserCountryMap')
         ) {
-            //$view->userCountryMapUrl = $this->getUserCountryMapUrlForVisitorProfile();
+            $view->userCountryMapUrl = $this->getUserCountryMapUrlForVisitorProfile();
         }
 
         $this->setWidgetizedVisitorProfileUrl($view);
@@ -140,7 +141,7 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
 
         $idSite = Common::getRequestVar('idsite', null, 'int');
 
-        $conversation = new Conversation($idSite, bin2hex($visitorInfo['idvisitor']));
+        $conversation = new ChatConversation($idSite, bin2hex($visitorInfo['idvisitor']));
 
         /***
          * Segment recognition
@@ -187,15 +188,15 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
 
         }
 
-        $messages = $conversation->getAllMessages();
-
         $view = new View('@Chat/popout.twig');
-        $view->messages = $messages;
-        $view->state = $_SESSION['popoutState'];
         $view->idvisitor = bin2hex($visitorInfo['idvisitor']);
+        $view->idsite = $idSite;
         $view->timeLimit = time() - (2 * 60 * 60);
-        $view->isStaffOnline = $conversation->isStaffOnline();
-        $view->siteUrl = Conversation::getSiteMainUrl($idSite);
+        $view->isStaffOnline = ChatPiwikUser::isStaffOnline();
+        $view->siteUrl = ChatSite::getMainUrl($idSite);
+
+        if(isset($visitorInfo['location_browser_lang']))
+            $view->lang = $visitorInfo['location_browser_lang'];
 
         return $view->render();
     }
@@ -228,7 +229,7 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         $view->piwikVersion = Version::VERSION;
         $view->chatVersion = $jsonConfig['version'];
         $view->email = Piwik::getCurrentUserEmail();
-        $view->website = Conversation::getSiteMainUrl($idSite);
+        $view->website = ChatSite::getMainUrl($idSite);
         $view->idSite = $idSite;
         $view->displayNotice = Common::getRequestVar('submittedBugReport', '0', 'int');
 
