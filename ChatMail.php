@@ -10,6 +10,7 @@
  */
 namespace Piwik\Plugins\Chat;
 
+use Piwik\Config;
 use Piwik\Db;
 use Piwik\Mail;
 
@@ -31,7 +32,7 @@ class ChatMail {
         <br /><br />
         Message:<br />$message");
 
-        foreach (self::getUsersBySite() as $user) {
+        foreach (ChatCommon::getUsersBySite($idsite) as $user) {
             if (empty($user['email'])) {
                 continue;
             }
