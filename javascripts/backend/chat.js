@@ -77,7 +77,7 @@ Piwik_Chat_Admin = (function ($, require) {
 
             appendMessage(piwik.userLogin, message);
 
-            $(textareaDomElement).val("");
+            textareaDomElement.val('').text('');
 
             var ajaxHelper = require('ajaxHelper');
 
@@ -257,6 +257,10 @@ Piwik_Chat_Admin = (function ($, require) {
             return start();
         },
 
+        sendMessage: function (textareaDomElement) {
+            return sendMessage(textareaDomElement);
+        },
+
         clickOnProfileLink: function (domElement) {
             return clickOnProfileLink(domElement);
         },
@@ -300,6 +304,13 @@ Piwik_Chat_Admin = (function ($, require) {
     ChatVisitorProfile.initElements = function () {
         UIControl.initElements(this, '.visitor-profile');
         Piwik_Chat_Admin.scrollDown();
+
+        var state = localStorage.getItem('PressEnterToSubmit');
+
+        if(state == '1'){
+            $('#press-enter-to-submit').prop('checked', true);
+            $('#button-submit-conversation-textarea').attr('disabled', 'disabled');
+        }
     };
 
     $.extend(ChatVisitorProfile.prototype, VisitorProfileControl.prototype, {
@@ -446,10 +457,31 @@ Piwik_Chat_Admin = (function ($, require) {
                 Piwik_Chat_Admin.scrollDown();
             });
 
-            $element.on('keydown', '.visitor-profile-chat-conversation-textarea', function (e) {
+            $element.on('change', '#press-enter-to-submit', function (e) {
+                var state;
 
-                if (e.which == 13 && !e.shiftkey) { // on <- key press, load previous visitor
+                if(($(this).prop('checked') == true)){
+                    $('#button-submit-conversation-textarea').attr('disabled', 'disabled');
+                    state = 1;
+                } else {
+                    $('#button-submit-conversation-textarea').prop('disabled', false);
+                    state = 0;
+                }
+
+                localStorage.setItem('PressEnterToSubmit', state);
+            });
+
+            $element.on('keydown', '.visitor-profile-chat-conversation-textarea', function (e) {
+                if (e.which == 13 && !e.shiftKey && $("#press-enter-to-submit").prop("checked") == true) {
+                    e.preventDefault();
                     Piwik_Chat_Admin.sendMessage($(this));
+                    e.stopPropagation();
+                }
+            });
+
+            $element.on('click', '#button-submit-conversation-textarea', function (e) {
+                if ($("#press-enter-to-submit").prop("checked") == false) {
+                    Piwik_Chat_Admin.sendMessage($('.visitor-profile-chat-conversation-textarea'));
                 }
             });
 

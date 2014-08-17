@@ -1,8 +1,8 @@
 {% if not visitorData %}
     <div class="pk-emptyDataTable">{{ 'CoreHome_ThereIsNoDataForThisReport'|translate }}</div>
 {% else %}
-    <script src="plugins/Chat/javascripts/backend/jquery.wysibb.js"></script>
-    <link rel="stylesheet" href="plugins/Chat/stylesheets/backend/wbbtheme.css" type="text/css"/>
+    <!--<script src="plugins/Chat/javascripts/backend/jquery.wysibb.js"></script>
+    <link rel="stylesheet" href="plugins/Chat/stylesheets/backend/wbbtheme.css" type="text/css"/>-->
     <div class="visitor-profile"
          data-visitor-id="{{ visitorData.lastVisits.getFirstRow().getColumn('visitorId') }}"
          data-next-visitor="{{ visitorData.nextVisitorId }}"
@@ -233,7 +233,12 @@
             </div>
 
             <textarea class="visitor-profile-chat-conversation-textarea"></textarea>
-            <!--<input type="submit" class="submit-button" style="float: right; margin-top: 10px;" />-->
+
+            <div style="float: left">
+                <input type="checkbox" id="press-enter-to-submit" /><label for="press-enter-to-submit" style="font-size: 12px;">Press enter to submit</label>
+            </div>
+            <input type="submit" id="button-submit-conversation-textarea" class="submit-button chat-btn" style="float: right;" />
+            <div style="clear: both;"></div>
         </div>
     </div>
     </div>

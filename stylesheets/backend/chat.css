@@ -61,12 +61,13 @@
 }
 
 .visitor-profile-chat-conversation-textarea {
-    height: 100px;
-    width: 100%;
-    background: white;
-    font-size: 12px;
-    border: 1px solid #D1CEC8;
+    background: none repeat scroll 0 0 white;
+    border: 1px solid #d1cec8;
     color: #333;
+    font-size: 12px !important;
+    height: 100px;
+    line-height: 14px;
+    width: 100%;
 }
 
 .list-conversations tr.unread td.content {
@@ -165,4 +166,10 @@
 
 .visitor-profile-info .visitor-profile-visits-info{
     border-left: 0px;
+}
+
+.chat-btn[disabled] {
+    cursor: not-allowed;
+    opacity: 0.65;
+    pointer-events: none;
 }
