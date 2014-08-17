@@ -24,8 +24,7 @@ $.fn.serializeObject = function(){
 };
 
 $(document).ready(function () {
-    Piwik_Chat_Admin.poll(true);
-    Piwik_Chat_Admin.bind();
+    Piwik_Chat_Admin.start();
 });
 
 Piwik_Chat_Admin = (function ($, require) {
@@ -33,6 +32,12 @@ Piwik_Chat_Admin = (function ($, require) {
         winTitle = window.document.title,
         shouldStopTitleNotification = false,
         titleNotificationInFunction = false;
+
+    function start(){
+        poll(true);
+        bind();
+        getUnreadConversations();
+    }
 
     function bind(){
         $(window).focus(function(){
@@ -88,6 +93,21 @@ Piwik_Chat_Admin = (function ($, require) {
         }
     }
 
+    function getUnreadConversations(){
+        var ajaxHelper = require('ajaxHelper'),
+            ajax = new ajaxHelper();
+
+        ajax.setUrl("index.php");
+        ajax.addParams({module: 'API', method: 'Chat.getUnreadConversations', idSite: piwik.idSite, format: 'json'}, 'GET');
+        ajax.setCallback(function (data) {
+            if(typeof data === 'object' && data.length > 0){
+                displayNotificationOnTopMenu();
+            }
+        });
+        ajax.setFormat('json'); // the expected response format
+        ajax.send();
+    }
+
     function setPendingMessages(data) {
         localStorage.setItem('pendingMessages', JSON.stringify(data));
     }
@@ -130,12 +150,6 @@ Piwik_Chat_Admin = (function ($, require) {
                                 visitorId = currentRecord.idvisitor;
 
                             if (!pendingMessages[visitorId] || currentRecord.lastsent > pendingMessages[visitorId].lastsent) {
-                                /**
-                                 * If we are on the Chat module index
-                                 */
-                                if (broadcast.getHash().match(/module=Chat&action=index/g).length != null) {
-                                    broadcast.propagateAjax(broadcast.getHash());
-                                }
 
                                 /**
                                  * If the VisitorProfile popup if open
@@ -145,6 +159,13 @@ Piwik_Chat_Admin = (function ($, require) {
 
                                     // Remove 'unread' class
                                     $('.list-conversations').find("[data-visitor-id='" + visitorId + "']").removeClass('unread');
+                                } else {
+                                    /**
+                                     * If we are on the Chat module index
+                                     */
+                                    if (broadcast.getHash().match(/module=Chat&action=index/g).length != null) {
+                                        broadcast.propagateAjax(broadcast.getHash());
+                                    }
                                 }
 
                                 if (!broadcast.getHashFromUrl().match(new RegExp(visitorId))) {
@@ -156,14 +177,24 @@ Piwik_Chat_Admin = (function ($, require) {
                         shouldWeDisplayNotif = true;
                     }
 
-                    if (!$('#Chat > a').hasClass('new-messages') && shouldWeDisplayNotif) {
-                        $('#Chat > a, #Chat_index > a').addClass('new-messages');
+                    if(shouldWeDisplayNotif){
+                        displayNotificationOnTopMenu();
                     }
 
                     setPendingMessages(data);
                 }
             });
         }
+    }
+
+    function displayNotificationOnTopMenu(){
+        if (!$('#Chat > a').hasClass('new-messages')) {
+            $('#Chat > a, #Chat_index > a').addClass('new-messages');
+        }
+    }
+
+    function hideNotificationOnTopMenu(){
+        $('#Chat > a, #Chat_index > a').removeClass('new-messages');
     }
 
     function showTitleNotification(){
@@ -207,7 +238,7 @@ Piwik_Chat_Admin = (function ($, require) {
         broadcast.propagateNewPopoverParameter('visitorProfile', $(domElement).attr('data-visitor-id'), $(domElement).attr('data-goto-chat'));
 
         if ($('.list-conversations .unread').length == 0){
-            $('#Chat > a, #Chat_index > a').removeClass('new-messages');
+            hideNotificationOnTopMenu();
         }
 
         return false;
@@ -222,12 +253,8 @@ Piwik_Chat_Admin = (function ($, require) {
             return scrollDown();
         },
 
-        poll: function (microtime) {
-            return poll(microtime);
-        },
-
-        sendMessage: function (textareaDomElement) {
-            return sendMessage(textareaDomElement);
+        start: function () {
+            return start();
         },
 
         clickOnProfileLink: function (domElement) {
@@ -236,14 +263,6 @@ Piwik_Chat_Admin = (function ($, require) {
 
         displayHelp: function () {
             return displayHelp();
-        },
-
-        stopTitleNotification: function() {
-            return stopTitleNotification();
-        },
-
-        bind: function() {
-            return bind();
         }
     }
 })(jQuery, require);
@@ -289,6 +308,11 @@ Piwik_Chat_Admin = (function ($, require) {
             delete this.$element;
 
             this._baseDestroyCalled = true;
+            broadcast.propagateAjax(broadcast.getHash());
+
+            if ($('.list-conversations').length > 0 && $('.list-conversations .unread').length == 0){
+                hideNotificationOnTopMenu();
+            }
         },
 
         _bindEventCallbacks: function () {
