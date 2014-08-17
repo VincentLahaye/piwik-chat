@@ -25,17 +25,16 @@
 .visitor-profile-chat-global-container {
     border-top: 1px solid #D1CEC8;
     padding: 10px;
-    background: #eee;
 }
 
 .visitor-profile-chat-conversation-container {
     padding: 10px;
-    height: 350px;
+    height: 300px;
     overflow-y: auto;
     margin-bottom: 10px;
     background: white;
     font-size: 12px;
-    border: 1px solid #D1CEC8;
+    /*border: 1px solid #D1CEC8;*/
 }
 
 .visitor-profile-chat-conversation-container p {
@@ -143,8 +142,10 @@
     cursor: no-drop;
 }
 
-.whatsHappening{
+.whats-happening{
     margin-left: 20px;
+    font-size: 11px;
+    color: #0d0d0d;
 }
 
 .bigTitle{
@@ -160,4 +161,8 @@
     line-height: 10px;
     min-height: 10px;
     margin: 10px 10px 0px 0px;
+}
+
+.visitor-profile-info .visitor-profile-visits-info{
+    border-left: 0px;
 }
