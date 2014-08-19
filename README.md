@@ -1,4 +1,6 @@
-# Chat Plugin for Piwik
+# Chat Plugin for Piwik (BETA)
+This plugin is not production ready, but any help is appreciate!
+
 Engage people you don't know at all, with this targeted and efficient chat system, directly integrated into Piwik.
 
 The client has these three states, plus a minimized state :
@@ -32,6 +34,18 @@ After installing the plugin, you have to modify your tracking code. It includes 
 
 ## Changelog
 
+v0.2 :
+
++ Piwik 2.5.0 ready
++ Add automatic messages based on segment recognition
++ General improvement on client popout
+    + Load message over ajax
+    + Add moment.js
+    + Update the communication (based on esayXDM) between the popout and its parent iframe. See : https://github.com/VincentLahaye/piwik-chat/commit/ced4662d83cc8efc98b58b27e92ab6d06bb29546
++ Update VisitorProfile popup
+    + Improve textarea input interractions
++ Rewrite a lot of code regarding the "model" file Conversation.php, now split in different files
+
 v0.1.6 :
 
 + Add a reporting bug system
@@ -57,14 +71,10 @@ v0.1 :
 +   French translation
 
 ## Roadmap
-v0.2 :
+v0.3 :
 
 *   Add a reporting system that shows figures about the module impact
 *   Add external cache support for polling (APC, Memcache, opCache...)
-
-v0.3 :
-
-*   Add support for automatic messages by segment recognition
 
 ## Academical study
 As an MSc student in eBusiness, this project is part of my final dissertation : "How to engage people you don't know at all ?".
