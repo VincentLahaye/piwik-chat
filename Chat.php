@@ -132,6 +132,21 @@ class Chat extends \Piwik\Plugin
              */
             $sql .= "ALTER TABLE " . Common::prefixTable('user') . " ADD COLUMN `last_poll` varchar(15) DEFAULT NULL;";
 
+            $sql .= "CREATE TABLE " . Common::prefixTable('chat_automatic_message') . " (
+                        `id` int(10) NOT NULL AUTO_INCREMENT,
+                        `name` varchar(100) NOT NULL,
+                        `segment` int(10) NOT NULL,
+                        `message` text,
+                        `idsite` int(10) NOT NULL,
+                        `frequency` varchar(100) NOT NULL DEFAULT '0',
+                        `transmitter` varchar(100) NOT NULL DEFAULT '',
+                        PRIMARY KEY (`id`),
+                        KEY `segment_id` (`segment`),
+                        CONSTRAINT `segment_id` FOREIGN KEY (`segment`) REFERENCES `" . Common::prefixTable('segment') . "` (`idsegment`) ON DELETE CASCADE
+                      )";
+
+            $sql .= "ALTER TABLE " . Common::prefixTable('chat') . " ADD COLUMN `idautomsg` int(10) DEFAULT NULL;";
+
             Db::exec($sql);
 
         } catch (Exception $e) {
@@ -148,6 +163,7 @@ class Chat extends \Piwik\Plugin
             Db::dropTables(Common::prefixTable('chat'));
             Db::dropTables(Common::prefixTable('chat_history_admin'));
             Db::dropTables(Common::prefixTable('chat_personnal_informations'));
+            Db::dropTables(Common::prefixTable('chat_automatic_message'));
 
             $sql = "ALTER TABLE " . Common::prefixTable('user') . " DROP COLUMN `last_poll`;";
             Db::exec($sql);
