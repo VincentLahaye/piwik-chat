@@ -64,7 +64,7 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         Piwik::checkUserHasSomeAdminAccess();
 
         $idSite = Common::getRequestVar('idSite', null, 'int');
-        $gotoChat = Common::getRequestVar('chat', false);
+        $gotoChat = Common::getRequestVar('chat', '0', 'int');
         $idvisitor = Common::getRequestVar('visitorId', null, 'string');
 
         if (!$gotoChat) {
@@ -139,6 +139,9 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
 
         $visitorInfo = $visitor->getVisitorInfo();
 
+        if(!isset($visitorInfo['location_browser_lang']))
+            return "Who are you ?";
+
         $idSite = Common::getRequestVar('idsite', null, 'int');
 
         $conversation = new ChatConversation($idSite, bin2hex($visitorInfo['idvisitor']));
@@ -194,9 +197,7 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         $view->timeLimit = time() - (2 * 60 * 60);
         $view->isStaffOnline = ChatPiwikUser::isStaffOnline();
         $view->siteUrl = ChatSite::getMainUrl($idSite);
-
-        if(isset($visitorInfo['location_browser_lang']))
-            $view->lang = $visitorInfo['location_browser_lang'];
+        $view->lang = $visitorInfo['location_browser_lang'];
 
         return $view->render();
     }
