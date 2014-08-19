@@ -37,7 +37,7 @@ class ChatConversation
         $additionnalParams = "";
         $microtime = microtime(true);
 
-        $arguments = $initArgs = array(
+        $arguments = array(
             $this->idsite,
             $hexVisitorId,
             $sanitizeContent,
@@ -61,7 +61,7 @@ class ChatConversation
             ChatMail::sendNotificationToAdmin($this->idsite, $this->idvisitor, $sanitizeContent);
         }
 
-        $insertedRow = Db::fetchRow("SELECT * FROM " . Common::prefixTable('chat') . " WHERE idsite = ? AND idvisitor = ? AND content = ? AND microtime = ?", $initArgs);
+        $insertedRow = Db::fetchRow("SELECT idmessage,microtime FROM " . Common::prefixTable('chat') . " WHERE idvisitor = ? AND microtime = ?", array($hexVisitorId, $microtime));
 
         return $insertedRow;
     }
@@ -106,13 +106,12 @@ class ChatConversation
             @Common::hex2bin($this->idvisitor)
         );
 
-        if($microtime != false){
+        if($microtime && $microtime != false && is_numeric($microtime)){
             $additionnalParams = " AND microtime > ?";
             $arguments[] = $microtime;
         }
 
         $rows = Db::fetchAll("SELECT idmessage, content, answerfrom, microtime, idautomsg FROM " . Common::prefixTable('chat') . " WHERE idsite = ? AND idvisitor = ?". $additionnalParams, $arguments);
-
         $rows = ChatCommon::formatRows($rows);
 
         return $rows;
