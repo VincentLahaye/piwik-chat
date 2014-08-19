@@ -319,3 +319,7 @@ form {
 .is-staff-online .yes .circle {
     background: none repeat scroll 0 0 #0F9D28;
 }
+
+.chat-msg.loading, .author-container.loading{
+    color: #DDD;
+}
