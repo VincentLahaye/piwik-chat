@@ -235,7 +235,7 @@ Piwik_Chat_Admin = (function ($, require) {
 
     function clickOnProfileLink(domElement) {
         $(domElement).parent().parent().removeClass('unread');
-        broadcast.propagateNewPopoverParameter('visitorProfile', $(domElement).attr('data-visitor-id'), $(domElement).attr('data-goto-chat'));
+        broadcast.propagateNewPopoverParameter('visitorProfile', $(domElement).attr('data-visitor-id') + '|' + $(domElement).attr('data-goto-chat'));
 
         if ($('.list-conversations .unread').length == 0){
             hideNotificationOnTopMenu();
@@ -365,9 +365,9 @@ Piwik_Chat_Admin = (function ($, require) {
             });
 
             $element.on('keydown', function (e) {
-                if (e.which == 37) { // on <- key press, load previous visitor
+                if (e.which == 37 && $('.visitor-profile-chat-conversation-textarea').is(':focus') === false) { // on <- key press, load previous visitor
                     self._loadPreviousVisitor();
-                } else if (e.which == 39) { // on -> key press, load next visitor
+                } else if (e.which == 39 && $('.visitor-profile-chat-conversation-textarea').is(':focus') === false) { // on -> key press, load next visitor
                     self._loadNextVisitor();
                 }
             });
@@ -521,7 +521,12 @@ Piwik_Chat_Admin = (function ($, require) {
     exports.ChatVisitorProfile = ChatVisitorProfile;
 
     // update the popup handler that creates a visitor profile
-    broadcast.addPopoverHandler('visitorProfile', function (visitorId, chat) {
+    broadcast.addPopoverHandler('visitorProfile', function (paramsString) {
+
+        var params = paramsString.split('|'),
+            visitorId = params[0],
+            chat = params[1];
+
         var url = 'module=Chat&action=getVisitorProfilePopup&visitorId=' + encodeURIComponent(visitorId);
 
         // if there is already a map shown on the screen, do not show the map in the popup. kartograph seems
@@ -530,7 +535,7 @@ Piwik_Chat_Admin = (function ($, require) {
             url += '&showMap=0';
         }
 
-        if (chat) {
+        if (chat !== 'undefined' && chat != '') {
             url += '&chat=1';
         }
 
