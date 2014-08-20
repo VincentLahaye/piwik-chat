@@ -1,6 +1,6 @@
 {
     "name": "Chat",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "description": "Not production ready. Join the Beta test ! Engage people you don't know at all, with this targeted and efficient chat system, directly integrated into Piwik.",
     "keywords": ["chat"],
     "license": "GPL v3+",
