@@ -376,4 +376,40 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
             ));
         }
     }
+
+    private function getUserCountryMapUrlForVisitorProfile()
+    {
+        $params = array(
+            'module'             => 'UserCountryMap',
+            'action'             => 'realtimeMap',
+            'segment'            => self::getSegmentWithVisitorId(),
+            'visitorId'          => false,
+            'changeVisitAlpha'   => 0,
+            'removeOldVisits'    => 0,
+            'realtimeWindow'     => 'false',
+            'showFooterMessage'  => 0,
+            'showDateTime'       => 0,
+            'doNotRefreshVisits' => 1
+        );
+        return Url::getCurrentQueryStringWithParametersModified($params);
+    }
+
+    private static function getSegmentWithVisitorId()
+    {
+        static $cached = null;
+        if ($cached === null) {
+            $segment = Request::getRawSegmentFromRequest();
+            if (!empty($segment)) {
+                $segment = urldecode($segment) . ';';
+            }
+
+            $idVisitor = Common::getRequestVar('visitorId', false);
+            if ($idVisitor === false) {
+                $idVisitor = Request::processRequest('Live.getMostRecentVisitorId');
+            }
+
+            $cached = urlencode($segment . 'visitorId==' . $idVisitor);
+        }
+        return $cached;
+    }
 }
