@@ -28,6 +28,8 @@ require_once PIWIK_INCLUDE_PATH . '/plugins/Chat/ChatConversation.php';
  */
 class API extends \Piwik\Plugin\API
 {
+    private $mailToSend;
+
     public function poll($idSite, $visitorId = false, $microtime = false, $fromAdmin = false)
     {
         if ($fromAdmin) {
@@ -60,6 +62,14 @@ class API extends \Piwik\Plugin\API
 
         $conversation = new ChatConversation($idSite, $visitorId);
         $newMessages = $conversation->sendMessage($message, $fromAdmin);
+
+        if($fromAdmin){
+            $this->mailToSend = array(
+                'idsite' => $idSite,
+                'idvisitor' => $visitorId,
+                'message' => $message
+            );
+        }
 
         return $newMessages;
     }
@@ -136,5 +146,11 @@ class API extends \Piwik\Plugin\API
         }
 
         Piwik::checkUserHasViewAccess($idSite);
+    }
+
+    public function __destruct(){
+        if(is_array($this->mailToSend)){
+            ChatMail::sendNotificationToAdmin($this->mailToSend);
+        }
     }
 }

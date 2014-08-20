@@ -15,8 +15,10 @@ use Piwik\Db;
 use Piwik\Mail;
 
 class ChatMail {
-    public static function sendNotificationToAdmin($idsite, $idvisitor, $message)
+    public static function sendNotificationToAdmin($args)
     {
+        list($idsite, $idvisitor, $message) = $args;
+
         $visitorInfo = ChatPersonnalInformation::get($idvisitor);
 
         $subject = "New message on " . ChatSite::getSiteName($idsite);

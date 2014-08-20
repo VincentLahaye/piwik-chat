@@ -58,7 +58,7 @@ class ChatConversation
 
         if (!$fromAdmin) {
             ChatAcknowledgment::setLastSent($this->idsite, $this->idvisitor, $microtime);
-            ChatMail::sendNotificationToAdmin($this->idsite, $this->idvisitor, $sanitizeContent);
+            //ChatMail::sendNotificationToAdmin($this->idsite, $this->idvisitor, $sanitizeContent);
         }
 
         $insertedRow = Db::fetchRow("SELECT idmessage,microtime FROM " . Common::prefixTable('chat') . " WHERE idvisitor = ? AND microtime = ?", array($hexVisitorId, $microtime));
