@@ -149,7 +149,9 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         /***
          * Segment recognition
          */
-        foreach(ChatSegment::getAll($idSite) as $segment){
+        foreach(ChatAutomaticMessage::getAll($idSite) as $autoMsg){
+            $segment = ChatSegment::get($autoMsg['segmentID']);
+
             $fetchSegment = new Segment($segment['definition'], array($idSite));
             $query = $fetchSegment->getSelectQuery("idvisitor", "log_visit", "log_visit.idvisitor = ?", array($visitorInfo['idvisitor']));
 
@@ -158,14 +160,14 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
             if(count($rows) == 0)
                 continue;
 
-            foreach(ChatAutomaticMessage::getAll($idSite) as $autoMsg){
-                if($autoMsg['segmentID'] != $segment['idsegment'])
-                    continue;
+            if($autoMsg['segmentID'] != $segment['idsegment'])
+                continue;
 
-                $getAlreadyReceivedMsg = $conversation->getAutomaticMessageReceivedById($autoMsg['id']);
+            $getAlreadyReceivedMsg = $conversation->getAutomaticMessageReceivedById($autoMsg['id']);
 
+            if(count($getAlreadyReceivedMsg) > 0){
                 // If the AutoMsg is a "one shot"
-                if($autoMsg['frequency'] == 0 && count($getAlreadyReceivedMsg) > 0)
+                if($autoMsg['frequency'] == 0)
                     continue;
 
                 if($autoMsg['frequency'] != 0){
@@ -185,10 +187,9 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
                     if(($getAlreadyReceivedMsg[0]['microtime'] + $secToWait) > microtime(true))
                         continue;
                 }
-
-                $conversation->sendMessage($autoMsg['message'], $autoMsg['transmitter'], $autoMsg['id']);
             }
 
+            $conversation->sendMessage($autoMsg['message'], $autoMsg['transmitter'], $autoMsg['id']);
         }
 
         $view = new View('@Chat/popout.twig');

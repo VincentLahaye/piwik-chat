@@ -45,7 +45,7 @@ v0.2 :
 + General improvement on client popout
     + Load message over ajax
     + Add moment.js
-    + Update the communication (based on esayXDM) between the popout and its parent iframe. See : https://github.com/VincentLahaye/piwik-chat/commit/ced4662d83cc8efc98b58b27e92ab6d06bb29546
+    + Update the communication (based on easyXDM) between the popout and its parent iframe. See : https://github.com/VincentLahaye/piwik-chat/commit/ced4662d83cc8efc98b58b27e92ab6d06bb29546
 + Update VisitorProfile popup
     + Improve textarea input interractions
 + Rewrite a lot of code regarding the "model" file Conversation.php, now split in different files
