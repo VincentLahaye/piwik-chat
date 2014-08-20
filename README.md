@@ -34,6 +34,10 @@ After installing the plugin, you have to modify your tracking code. It includes 
 
 ## Changelog
 
+v0.2.2 :
+
++ Add DB Versioning support
+
 v0.2 :
 
 + Piwik 2.5.0 ready
