@@ -25,7 +25,7 @@ class ChatDbManager
             Common::prefixTable('chat_automatic_message')
         ));
 
-        $sql = "ALTER TABLE " . Common::prefixTable('user') . " DELETE COLUMN `last_poll`;";
+        $sql = "ALTER TABLE " . Common::prefixTable('user') . " DROP COLUMN `last_poll`;";
         Db::exec($sql);
     }
 
