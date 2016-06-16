@@ -5,7 +5,8 @@ namespace Piwik\Plugins\Chat;
 use Piwik\Common;
 use Piwik\Db;
 
-class ChatSegment {
+class ChatSegment 
+{
     public static function getAll($idSite)
     {
         return Db::fetchAll("SELECT * FROM " . Common::prefixTable('segment') . " WHERE enable_only_idsite = 0 OR enable_only_idsite = ?", array($idSite));

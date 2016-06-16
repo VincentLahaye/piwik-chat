@@ -78,7 +78,7 @@ var Piwik_Chat_Client = (function () {
     return {
         waitForPiwik: function (p, callback) {
             waitForPiwik(p, callback);
-        },
+        }
     }
 })();
 

@@ -13,7 +13,8 @@ namespace Piwik\Plugins\Chat;
 use Piwik\Common;
 use Piwik\Db;
 
-class ChatSite {
+class ChatSite 
+{
     public static function getMainUrl($idsite)
     {
         return Db::fetchOne("SELECT main_url FROM " . Common::prefixTable('site') . " WHERE idsite = ?", array($idsite));

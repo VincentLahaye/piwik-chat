@@ -14,7 +14,8 @@ use Piwik\Config;
 use Piwik\Db;
 use Piwik\Mail;
 
-class ChatMail {
+class ChatMail 
+{
     public static function sendNotificationToAdmin($args)
     {
         list($idsite, $idvisitor, $message) = $args;

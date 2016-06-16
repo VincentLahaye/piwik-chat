@@ -12,6 +12,7 @@ namespace Piwik\Plugins\Chat;
 
 use Piwik\API\Request;
 use Piwik\Common;
+use Piwik\Container\StaticContainer;
 use Piwik\Db;
 use Piwik\Mail;
 use Piwik\Piwik;
@@ -19,6 +20,8 @@ use Piwik\Plugins\Goals\API as APIGoals;
 use Piwik\Segment;
 use Piwik\Tracker;
 use Piwik\Tracker\Visitor;
+use Piwik\Tracker\Visit\VisitProperties;
+use Piwik\Tracker\Request as TrackerRequest;
 use Piwik\Url;
 use Piwik\UrlHelper;
 use Piwik\Version;
@@ -33,27 +36,23 @@ $GLOBALS['PIWIK_TRACKER_DEBUG_FORCE_SCHEDULED_TASKS'] = false;
  *
  * @package Chat
  */
-class Controller extends \Piwik\Plugin\ControllerAdmin
+class Controller extends \Piwik\Plugin\Controller
 {
     public function index()
     {
         Piwik::checkUserHasSomeAdminAccess();
 
-        $idSite = Common::getRequestVar('idSite', null, 'int');
+        $idSite         = Common::getRequestVar('idSite', null, 'int');
+        $conversation   = new ChatConversation($idSite);
+        $messages       = $conversation->getListConversations();
+        $unread         = ChatAcknowledgment::getUnreadConversations(Piwik::getCurrentUserLogin());
+        $settings       = new Settings('Chat');
 
-        $conversation = new ChatConversation($idSite);
-        $messages = $conversation->getListConversations();
-
-        $unread = ChatAcknowledgment::getUnreadConversations(Piwik::getCurrentUserLogin());
-
-        $view = new View('@Chat/listConversations.twig');
-        $view->messages = $messages;
-        $view->unread = $unread;
-
-        $settings = new Settings('Chat');
-        $view->displayHelp = $settings->displayHelp->getValue();
-
-        return $view->render();
+        return $this->renderTemplate('index', array(
+            'messages' => $messages,
+            'unread' => $unread,
+            'displayHelp' => $settings->displayHelp->getValue()
+        ));
     }
 
     /**
@@ -112,8 +111,9 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
     {
         header("Access-Control-Allow-Origin: *");
 
+
         $params = UrlHelper::getArrayFromQueryString ($_SERVER['QUERY_STRING']);
-        $request = new Tracker\Request($params);
+        $request = new TrackerRequest($params);
 
         // the IP is needed by isExcluded() and GoalManager->recordGoals()
         $ip = $request->getIp();
@@ -129,22 +129,12 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
          */
         Piwik::postEvent('Tracker.setVisitorIp', array(&$visitorInfo['location_ip']));
 
-        /***
-         * Visitor recognition
-         */
-        $settings = new Tracker\Settings($request, $visitorInfo['location_ip']);
-
-        $visitor = new Visitor($request, $settings->getConfigId(), $visitorInfo);
-        $visitor->recognize();
-
-        $visitorInfo = $visitor->getVisitorInfo();
-
-        if(!isset($visitorInfo['location_browser_lang']))
+        if(!$request->getVisitorId())
             return "Who are you ?";
 
         $idSite = Common::getRequestVar('idsite', null, 'int');
 
-        $conversation = new ChatConversation($idSite, bin2hex($visitorInfo['idvisitor']));
+        $conversation = new ChatConversation($idSite, bin2hex($request->getVisitorId()));
 
         /***
          * Segment recognition
@@ -193,7 +183,7 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         }
 
         $view = new View('@Chat/popout.twig');
-        $view->idvisitor = bin2hex($visitorInfo['idvisitor']);
+        $view->idvisitor = bin2hex($request->getVisitorId());
         $view->idsite = $idSite;
         $view->timeLimit = time() - (2 * 60 * 60);
         $view->isStaffOnline = ChatPiwikUser::isStaffOnline();
@@ -288,21 +278,21 @@ class Controller extends \Piwik\Plugin\ControllerAdmin
         Piwik::checkUserHasSomeAdminAccess();
 
         // Get request variables
-        $idSite = Common::getRequestVar('idSite', null, 'int');
-        $idAutoMsg = Common::getRequestVar('idAutoMsg', '', 'int');
-        $name   = Common::getRequestVar('name', '');
-        $segment = Common::getRequestVar('segment', '');
+        $idSite     = Common::getRequestVar('idSite', null, 'int');
+        $idAutoMsg  = Common::getRequestVar('idAutoMsg', '', 'int');
+        $name       = Common::getRequestVar('name', '');
+        $segment    = Common::getRequestVar('segment', '');
         $transmitter = Common::getRequestVar('transmitter', '');
-        $message = Common::getRequestVar('message', '');
-        $freq    = Common::getRequestVar('frequency', '');
-        $freqTime = Common::getRequestVar('frequency-time', '1', 'int');
-        $freqScale = Common::getRequestVar('frequency-scale', 'd');
+        $message    = Common::getRequestVar('message', '');
+        $freq       = Common::getRequestVar('frequency', '');
+        $freqTime   = Common::getRequestVar('frequency-time', '1', 'int');
+        $freqScale  = Common::getRequestVar('frequency-scale', 'd');
 
-        // Do some job (insert or update) in case of we have enough information
-        if($idSite != '' && $name != '' && $segment != '' && $message != '' && $freq != '' && $transmitter != ''){
-
+        if($idSite != '' && $name != '' && $segment != '' && $message != '' && $freq != '' && $transmitter != '')
+        {
             $frequency = "0";
-            if($freq != "once"){
+            if($freq != "once")
+            {
                 if($freqScale != "d" && $freqScale != "w" && $freqScale != "m")
                     $freqScale = "d";
 

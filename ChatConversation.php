@@ -125,7 +125,7 @@ class ChatConversation
         );
 
         $row = Db::fetchRow("SELECT idvisitor, answerfrom, content, microtime,
-		(SELECT name FROM " . Common::prefixTable('chat_personnal_informations') . " WHERE idvisitor = chat.idvisitor) AS name
+		(SELECT name FROM " . Common::prefixTable('chat_personal_informations') . " WHERE idvisitor = chat.idvisitor) AS name
 		FROM " . Common::prefixTable('chat') . " AS chat WHERE idsite = ? AND idvisitor = ? ORDER BY microtime DESC LIMIT 1", $arguments);
         $row = ChatCommon::formatRow($row);
 
@@ -153,8 +153,8 @@ class ChatConversation
 			MAX(idmessage) AS maxid, 
 			(SELECT t2.content FROM " . Common::prefixTable('chat') . " AS t2 WHERE t2.idvisitor = t1.idvisitor ORDER BY t2.idmessage DESC LIMIT 1) AS content,
 			(SELECT t2.microtime FROM " . Common::prefixTable('chat') . " AS t2 WHERE t2.idvisitor = t1.idvisitor ORDER BY t2.idmessage DESC LIMIT 1) AS microtime,
-			(SELECT t3.name FROM " . Common::prefixTable('chat_personnal_informations') . " AS t3 WHERE t3.idvisitor = t1.idvisitor) AS name,
-			(SELECT t3.email FROM " . Common::prefixTable('chat_personnal_informations') . " AS t3 WHERE t3.idvisitor = t1.idvisitor) AS email
+			(SELECT t3.name FROM " . Common::prefixTable('chat_personal_informations') . " AS t3 WHERE t3.idvisitor = t1.idvisitor) AS name,
+			(SELECT t3.email FROM " . Common::prefixTable('chat_personal_informations') . " AS t3 WHERE t3.idvisitor = t1.idvisitor) AS email
 		FROM " . Common::prefixTable('chat') . " AS t1
 		WHERE idsite = ?
 		GROUP BY idvisitor

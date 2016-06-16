@@ -13,10 +13,11 @@ namespace Piwik\Plugins\Chat;
 use Piwik\Common;
 use Piwik\Db;
 
-class ChatPersonnalInformation {
+class ChatPersonnalInformation 
+{
     public static function get($idvisitor)
     {
-        $row = Db::fetchRow("SELECT * FROM " . Common::prefixTable('chat_personnal_informations') . " WHERE idvisitor = ?", array(@Common::hex2bin($idvisitor)));
+        $row = Db::fetchRow("SELECT * FROM " . Common::prefixTable('chat_personal_informations') . " WHERE idvisitor = ?", array(@Common::hex2bin($idvisitor)));
 
         if (!$row) {
             $row = array(
@@ -75,7 +76,7 @@ class ChatPersonnalInformation {
         $buildQuery = trim(substr_replace($buildQuery, "", -1));
         $arguments = array_merge($argSet, $argOnUpdate);
 
-        Db::query("INSERT INTO " . Common::prefixTable('chat_personnal_informations') . " SET idvisitor = ?, $buildQuery ON DUPLICATE KEY UPDATE $buildQuery", $arguments);
+        Db::query("INSERT INTO " . Common::prefixTable('chat_personal_informations') . " SET idvisitor = ?, $buildQuery ON DUPLICATE KEY UPDATE $buildQuery", $arguments);
 
         return true;
     }

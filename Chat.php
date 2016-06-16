@@ -44,37 +44,13 @@ class Chat extends \Piwik\Plugin
 
     public function getReportingMenuItems()
     {
-        \Piwik\Menu\MenuMain::getInstance()->add(
-            $category = 'Chat',
-            $title = '',
-            $urlParams = array('module' => $this->getPluginName(), 'action' => 'index'),
-            $showOnlyIf = Piwik::hasUserSuperUserAccess(),
-            $order = 11
-        );
-
-        \Piwik\Menu\MenuMain::getInstance()->add(
-            $category = 'Chat',
-            $title = 'Conversations',
-            $urlParams = array('module' => $this->getPluginName(), 'action' => 'index'),
-            $showOnlyIf = Piwik::hasUserSuperUserAccess(),
-            $order = 12
-        );
-
-        \Piwik\Menu\MenuMain::getInstance()->add(
-            $category = 'Chat',
-            $title = 'Automatic messages',
-            $urlParams = array('module' => $this->getPluginName(), 'action' => 'automaticMessages'),
-            $showOnlyIf = Piwik::hasUserSuperUserAccess(),
-            $order = 13
-        );
-
-        \Piwik\Menu\MenuMain::getInstance()->add(
+        /*\Piwik\Menu\MenuMain::getInstance()->add(
             $category = 'Chat',
             $title = 'Report a bug',
             $urlParams = array('module' => $this->getPluginName(), 'action' => 'reportBug'),
             $showOnlyIf = Piwik::hasUserSuperUserAccess(),
             $order = 14
-        );
+        );*/
 
         /*\Piwik\Menu\MenuMain::getInstance()->add(
             $category = 'Chat',
@@ -87,16 +63,10 @@ class Chat extends \Piwik\Plugin
 
     public function install()
     {
-        ChatDbManager::checkUpgrades();
+        ChatDbManager::install();
         return;
     }
-
-    public function postLoad()
-    {
-        ChatDbManager::checkUpgrades();
-        return;
-    }
-
+    
     public function uninstall()
     {
         ChatDbManager::uninstall();

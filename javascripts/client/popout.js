@@ -147,7 +147,7 @@ function Piwik_Chat_Popout() {
 
         var displayAuthor = false,
             currentAuthor = (message.answerfrom !== 'undefined' && message.answerfrom !== null) ? message.answerfrom : __tr['You'],
-            lastAuthor = (lastMessage.answerfrom !== 'undefined' && lastMessage.answerfrom !== null) ? lastMessage.answerfrom : __tr['You'],
+            lastAuthor = (lastMessage && lastMessage.answerfrom !== 'undefined' && lastMessage.answerfrom !== null) ? lastMessage.answerfrom : __tr['You'],
             classLoading = (loading == true) ? " loading" : "",
             html = "";
 

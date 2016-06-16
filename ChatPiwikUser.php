@@ -13,7 +13,8 @@ namespace Piwik\Plugins\Chat;
 use Piwik\Common;
 use Piwik\Db;
 
-class ChatPiwikUser {
+class ChatPiwikUser 
+{
     public static function setLastPoll($lastPoll, $login)
     {
         return Db::query("UPDATE " . Common::prefixTable('user') . " SET last_poll = ? WHERE login = ?", array($lastPoll, $login));

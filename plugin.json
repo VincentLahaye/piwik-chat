@@ -1,17 +1,17 @@
 {
     "name": "Chat",
-    "version": "0.2.4",
-    "description": "Not production ready. Join the Beta test ! Engage people you don't know at all, with this targeted and efficient chat system, directly integrated into Piwik.",
+    "version": "0.3.1",
+    "description": "Tested on 2.16.2. Adds to Piwik the ability to engage people on your website through Chat and automatic Push Messages.",
     "keywords": ["chat"],
     "license": "GPL v3+",
     "homepage": "https://github.com/VincentLahaye/piwik-chat",
     "require": {
-        "piwik": "2.4.0"
+        "piwik": "2.16.2"
     },
     "authors": [
         {
             "name": "Vincent Lahaye",
-            "email": "vincent.lahaye@supinfo.com"
+            "email": "contact@vincent-lahaye.com"
         }
     ]
 }
